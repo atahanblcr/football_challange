@@ -1040,5 +1040,21 @@ Her faz kendi test süitini içerir. Bir fazın testleri geçmeden sonraki faz b
 
 ---
 
+## 23. RAPORLAMA VE TAKİP KURALLARI
+
+Gemini, projenin her anındaki durumunu ve geçmişini şeffaf tutmak için şu iki dosyayı güncel tutmakla yükümlüdür:
+
+### 23.1 active_context.md
+- Bu dosya Gemini'nin **o anki** çalışma bağlamını içerir.
+- Hangi fazda olunduğu, hangi görevin yapıldığı ve bir sonraki adımın ne olduğu burada anlık olarak raporlanır.
+- Her görev değişikliğinde Gemini bu dosyayı güncellemelidir.
+
+### 23.2 progress.md
+- Projenin başından itibaren yapılan tüm işlemlerin (kurulumlar, modüller, testler, hatalar ve çözümleri) kronolojik dökümüdür.
+- Tamamlanan her görev için bir check-box (`[x]`) işaretlenir.
+- Bu dosya projenin "karar defteri" ve "hafızası" niteliğindedir.
+
+---
+
 *Bu dokümantasyon tüm karar süreçlerinin yazılı çıktısıdır.*
 *Burada belirtilmeyen bir konu çıkarsa Gemini karar vermeden önce kullanıcıya sorar.*

@@ -1,0 +1,36 @@
+# docker-compose.yml
+# Sadece GELİŞTİRME ortamı içindir.
+# Production'da Redis yerine Upstash kullanılır.
+# Supabase cloud'da çalıştığı için burada yer almaz.
+#
+# Kullanım:
+#   docker compose up -d        → Redis'i başlat
+#   docker compose down         → Durdur
+#   docker compose logs redis   → Log izle
+
+version: '3.9'
+
+services:
+  redis:
+    image: redis:7.2-alpine
+    container_name: fc_redis_dev
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: >
+      redis-server
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+      --save ""
+      --appendonly no
+    volumes:
+      - redis_dev_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  redis_dev_data:
+    driver: local

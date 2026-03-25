@@ -1,0 +1,284 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ENUM'LAR
+enum AuthProvider {
+  google
+  apple
+  email
+}
+
+enum SubscriptionTier {
+  free
+  premium
+}
+
+enum EntityType {
+  player
+  club
+  national
+  manager
+}
+
+enum Difficulty {
+  easy
+  medium
+  hard
+}
+
+enum QuestionStatus {
+  draft
+  active
+  archiving
+  archived
+  special
+}
+
+enum QuestionModule {
+  players
+  clubs
+  nationals
+  managers
+}
+
+enum AdminRole {
+  super_admin
+  editor
+  moderator
+}
+
+// KULLANICI
+model User {
+  id                String           @id @default(cuid())
+  email             String?          @unique
+  passwordHash      String?
+  authProvider      AuthProvider
+  authProviderId    String?
+
+  nickname          String           @unique @db.VarChar(20)
+  countryCode       String?          @db.Char(2)
+  avatarIndex       Int?
+  referralCode      String           @unique @db.VarChar(10)
+  referredByCode    String?          @db.VarChar(10)
+
+  subscriptionTier  SubscriptionTier @default(free)
+  premiumExpiresAt  DateTime?
+
+  isBanned          Boolean          @default(false)
+  banSuggested      Boolean          @default(false)
+  banSuggestedBy    String?
+  banSuggestedAt    DateTime?
+
+  nicknameChangedAt DateTime?
+  lastActiveAt      DateTime         @default(now())
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  gameSessions      GameSession[]
+  pointHistory      PointHistory[]
+
+  @@index([email])
+  @@index([nickname])
+  @@index([countryCode])
+  @@index([subscriptionTier])
+  @@index([isBanned])
+  @@index([lastActiveAt])
+}
+
+// ENTİTY
+model Entity {
+  id          String     @id @default(cuid())
+  type        EntityType
+  name        String     @db.VarChar(100)
+  nameTr      String?    @db.VarChar(100)
+  countryCode String?    @db.Char(2)
+  alias       String[]   @default([])
+  imagePath   String?    @db.VarChar(255)
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  questionAnswers QuestionAnswer[]
+
+  @@index([type])
+  @@index([name])
+  @@index([isActive])
+}
+
+// SORU
+model Question {
+  id          String         @id @default(cuid())
+  title       String         @db.VarChar(300)
+  module      QuestionModule
+  category    String?        @db.VarChar(100)
+  difficulty  Difficulty
+  status      QuestionStatus @default(draft)
+  basePoints  Int            @default(100)
+  timeLimit   Int            @default(60)
+  answerCount Int
+
+  isSpecial   Boolean        @default(false)
+  specialEventId String?
+
+  scheduledFor DateTime?
+  publishedAt  DateTime?
+  archivedAt   DateTime?
+
+  createdBy   String
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  answers          QuestionAnswer[]
+  gameSessions     GameSession[]
+  dailyAssignments DailyQuestionAssignment[]
+  specialEvent     SpecialEvent?  @relation(fields: [specialEventId], references: [id])
+
+  @@index([module, status])
+  @@index([status])
+  @@index([scheduledFor])
+  @@index([isSpecial])
+}
+
+// SORU CEVAPLARI
+model QuestionAnswer {
+  id          String   @id @default(cuid())
+  questionId  String
+  entityId    String
+  rank        Int
+  statValue   String   @db.VarChar(50)
+  statDisplay String?  @db.VarChar(100)
+
+  question    Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  entity      Entity   @relation(fields: [entityId], references: [id])
+
+  @@unique([questionId, rank])
+  @@unique([questionId, entityId])
+  @@index([questionId])
+  @@index([entityId])
+}
+
+// GÜNLÜK SORU ATAMALARI
+model DailyQuestionAssignment {
+  id         String         @id @default(cuid())
+  date       DateTime       @db.Date
+  module     QuestionModule
+  questionId String
+  isSpecial  Boolean        @default(false)
+
+  question   Question @relation(fields: [questionId], references: [id])
+
+  @@unique([date, module])
+  @@index([date])
+}
+
+// OYUN OTURUMU
+model GameSession {
+  id          String   @id @default(cuid())
+  userId      String
+  questionId  String
+
+  startedAt   DateTime @default(now())
+  submittedAt DateTime?
+
+  submittedAnswers String[] @default([])
+
+  correctRanks    Int[]    @default([])
+  wrongEntityIds  String[] @default([])
+  allSlotsFilled  Boolean  @default(false)
+
+  scoreBase        Int     @default(0)
+  scoreTimeBonus   Int     @default(0)
+  scoreDifficulty  Int     @default(0)
+  scoreFinal       Int     @default(0)
+  adMultiplied     Boolean @default(false)
+
+  flagSuspicious  Boolean @default(false)
+  suspiciousReason String?
+
+  cooldownUntil   DateTime?
+
+  createdAt       DateTime   @default(now())
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id])
+
+  @@unique([userId, questionId])
+  @@index([userId])
+  @@index([questionId])
+  @@index([submittedAt])
+  @@index([flagSuspicious])
+  @@index([cooldownUntil])
+}
+
+// PUAN GEÇMİŞİ
+model PointHistory {
+  id        String         @id @default(cuid())
+  userId    String
+  sessionId String
+  module    QuestionModule
+  isSpecial Boolean        @default(false)
+  points    Int
+
+  createdAt DateTime       @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([module])
+}
+
+// LEADERBOARD SNAPSHOT
+model LeaderboardSnapshot {
+  id         String   @id @default(cuid())
+  period     String   @db.VarChar(20)
+  periodKey  String   @db.VarChar(20)
+  scope      String   @db.VarChar(10)
+  snapshotAt DateTime
+  rankings   Json
+
+  @@unique([period, periodKey, scope])
+  @@index([period, scope])
+  @@index([snapshotAt])
+}
+
+// ÖZEL ETKİNLİK
+model SpecialEvent {
+  id          String   @id @default(cuid())
+  name        String   @db.VarChar(100)
+  description String?
+  startsAt    DateTime
+  endsAt      DateTime
+  isActive    Boolean  @default(false)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  questions   Question[]
+
+  @@index([isActive])
+  @@index([startsAt, endsAt])
+}
+
+// ADMİN KULLANICI
+model AdminUser {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  role         AdminRole @default(moderator)
+  isActive     Boolean   @default(true)
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([email])
+  @@index([role])
+}
