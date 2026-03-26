@@ -1,20 +1,20 @@
 # AKTİF ÇALIŞMA BAĞLAMI (ACTIVE CONTEXT)
 
 **Şu Anki Faz:** Faz 1 — Backend Core
-**Şu Anki Görev:** 1.6 — Soru ve Oyun Oturumu
+**Şu Anki Görev:** 1.9 — Test Maratonu (Tamamlandı)
 
 ## Mevcut Odak Noktası
-- Oyunun temel döngüsünün (`Start Session`, `Submit Answers`, `Get Result`) kodlanması.
-- Sunucu taraflı puanlama motorunun (Bölüm 6 formülü) implementasyonu.
-- Blur mantığı: Premium olmayan kullanıcılara cevapsız slotların gizli (blurred) gönderilmesi.
-- Hile tespiti entegrasyonu.
+- Tüm Backend Core modülleri için birim ve entegrasyon testleri yazıldı ve doğrulandı.
+- Puanlama algoritması, hile tespiti, blur mantığı ve Redis leaderboard işlemleri test edildi.
 
 ## Son Yapılan İşlem
-- Modül 1.5 Entity ve Arama Modülü başarıyla tamamlandı.
-- Tüm sistem testleri (Auth, Users, Search, Middleware) geçildi (45/45).
-- Redis ve FTS entegrasyonu doğrulandı.
+- `tests/unit/scoring.test.ts`
+- `tests/questions/questions.test.ts`
+- `tests/sessions/sessions.test.ts`
+- `tests/leaderboard/leaderboard.test.ts`
+- Toplam 20+ test senaryosu başarıyla geçildi.
+- Kod tabanındaki import ve tip hataları giderildi.
 
 ## Sıradaki Adımlar
-1. `src/modules/questions/` ve `src/modules/sessions/` servislerinin yazılması.
-2. `src/modules/scoring/scoring.service.ts` (Puanlama Motoru) yazılması.
-3. `tests/sessions/submit.test.ts` ile kapsamlı puanlama testleri.
+1. Faz 1'in son kontrolü ve Faz 2 — Admin Paneli geliştirmelerine geçiş.
+2. `admin/` dizinindeki React projesinin temel yapısının kurulması.

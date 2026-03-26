@@ -131,6 +131,7 @@ model Question {
   scheduledFor DateTime?
   publishedAt  DateTime?
   archivedAt   DateTime?
+  lastShownAt  DateTime?
 
   createdBy   String
   createdAt   DateTime       @default(now())

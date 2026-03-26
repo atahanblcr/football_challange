@@ -1,9 +1,18 @@
-// src/jobs/index.ts
-import cron from 'node-cron';
+import { dailyLimitResetJob } from './daily-limit-reset.job';
+import { dailyQuestionSelectorJob } from './daily-question-selector.job';
+import { cooldownCleanupJob } from './cooldown-cleanup.job';
+import { poolHealthCheckJob } from './pool-health-check.job';
+import { leaderboardArchiverJob } from './leaderboard-archiver.job';
+import { suspiciousFlagReportJob } from './suspicious-flag-report.job';
 
-export function startAllJobs() {
-  console.log('Cron işleri başlatılıyor...');
-  
-  // Örnek: Her gün gece yarısı (UTC+3 00:00)
-  // cron.schedule('0 0 * * *', () => { ... }, { timezone: 'Europe/Istanbul' });
-}
+/**
+ * Tüm zamanlanmış görevleri (Cron Jobs) başlatır.
+ */
+export const startAllJobs = () => {
+  dailyLimitResetJob();
+  dailyQuestionSelectorJob();
+  cooldownCleanupJob();
+  poolHealthCheckJob();
+  leaderboardArchiverJob();
+  suspiciousFlagReportJob();
+};

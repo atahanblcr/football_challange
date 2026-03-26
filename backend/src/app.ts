@@ -9,6 +9,9 @@ import { startAllJobs } from './jobs';
 import authRouter from './modules/auth/auth.router';
 import usersRouter from './modules/users/users.router';
 import searchRouter from './modules/search/search.router';
+import questionsRouter from './modules/questions/questions.router';
+import sessionsRouter from './modules/sessions/sessions.router';
+import leaderboardRouter from './modules/leaderboard/leaderboard.router';
 
 const app = express();
 
@@ -25,6 +28,9 @@ app.use(express.json({ limit: '10kb' }));
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/users', usersRouter);
 app.use('/api/v1/search', searchRouter);
+app.use('/api/v1/questions', questionsRouter);
+app.use('/api/v1/sessions', sessionsRouter);
+app.use('/api/v1/leaderboard', leaderboardRouter);
 
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 

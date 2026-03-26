@@ -23,7 +23,7 @@ export const rateLimitMiddleware = (limit: number, windowSeconds: number) => {
       }
 
       if (current > limit) {
-        throw ApiError.badRequest(ErrorCode.RATE_LIMIT_EXCEEDED, 'Çok fazla istek gönderildi. Lütfen bekleyin.');
+        throw new ApiError(429, ErrorCode.RATE_LIMIT_EXCEEDED, 'Çok fazla istek gönderildi. Lütfen bekleyin.');
       }
 
       next();
