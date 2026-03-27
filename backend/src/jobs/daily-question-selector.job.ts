@@ -29,9 +29,10 @@ export const runDailyQuestionSelector = async () => {
       // 1. Zaten seçilmiş mi kontrol et
       const existing = await prisma.dailyQuestionAssignment.findUnique({
         where: {
-          date_module: {
+          date_module_isExtra: {
             date: today,
             module: module,
+            isExtra: false,
           }
         }
       });

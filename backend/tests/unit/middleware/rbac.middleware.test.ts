@@ -16,7 +16,7 @@ describe('RbacMiddleware', () => {
   });
 
   it('should allow access if role is included', () => {
-    (mockRequest as any).adminUser = { role: AdminRole.super_admin };
+    (mockRequest as any).admin = { role: AdminRole.super_admin };
     const middleware = rbacMiddleware([AdminRole.super_admin, AdminRole.editor]);
     
     middleware(mockRequest as Request, mockResponse as Response, nextFunction);
@@ -25,7 +25,7 @@ describe('RbacMiddleware', () => {
   });
 
   it('should deny access if role is not included', () => {
-    (mockRequest as any).adminUser = { role: AdminRole.moderator };
+    (mockRequest as any).admin = { role: AdminRole.moderator };
     const middleware = rbacMiddleware([AdminRole.super_admin]);
     
     middleware(mockRequest as Request, mockResponse as Response, nextFunction);
@@ -35,7 +35,7 @@ describe('RbacMiddleware', () => {
     expect(error.statusCode).toBe(403);
   });
 
-  it('should deny access if adminUser is missing', () => {
+  it('should deny access if admin is missing', () => {
     const middleware = rbacMiddleware([AdminRole.super_admin]);
     
     middleware(mockRequest as Request, mockResponse as Response, nextFunction);

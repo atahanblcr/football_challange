@@ -131,10 +131,11 @@ describe('ScoringService Unit Tests', () => {
     it('should handle complex case (all bonuses)', () => {
       // 10 answers, base 100, hard difficulty, all slots filled, 45s remaining of 60s, ad watched
       // Position score: 1, 5, 10 => weight: 9, 13, 18 => (9+13+18)/135 * 100 = 40/135 * 100 = 29.629...
+      // Base score (rounded): floor(29.629) = 29
       // Time bonus: 45/60 * 25 = 0.75 * 25 = 18.75 => floor(18.75) = 18
-      // Sum: 29.629 + 18 = 47.629
-      // Difficulty: 47.629 * 1.5 (hard) = 71.44... => floor = 71
-      // Ad: 71 * 1.5 = 106.5 => floor = 106
+      // Sum: 29 + 18 = 47
+      // Difficulty: 47 * 1.5 (hard) = 70.5 => floor = 70
+      // Ad: 70 * 1.5 = 105 => floor = 105
       
       const result = ScoringService.calculateFinalScore({
         totalAnswers: 10,
@@ -149,8 +150,8 @@ describe('ScoringService Unit Tests', () => {
 
       expect(result.scoreBase).toBe(29);
       expect(result.scoreTimeBonus).toBe(18);
-      expect(result.scoreDifficulty).toBe(71); // floor((29.629 + 18) * 1.5) = floor(47.629 * 1.5) = floor(71.44) = 71
-      expect(result.scoreFinal).toBe(106); // floor(71 * 1.5) = 106.5 => floor = 106
+      expect(result.scoreDifficulty).toBe(70); 
+      expect(result.scoreFinal).toBe(105); 
     });
   });
 });

@@ -15,7 +15,10 @@ export class QuestionService {
     const date = new Date(dateString);
 
     const assignments = await prisma.dailyQuestionAssignment.findMany({
-      where: { date },
+      where: { 
+        date,
+        isExtra: false,
+      },
       include: {
         question: {
           select: {

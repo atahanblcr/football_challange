@@ -34,8 +34,9 @@ export const cheatDetectMiddleware = async (
     const submitTime = Date.now();
     const durationSeconds = (submitTime - startTime) / 1000;
     
-    // Her cevap için en az 4 saniye kuralı (Örn: 10 cevap için min 40 saniye)
-    const minRequiredTime = session.question.answerCount * 4;
+    // Cevap sayısına göre süre kontrolü (Her cevap için min 4s)
+    const submittedCount = (req.body.answers || []).length;
+    const minRequiredTime = submittedCount * 4;
 
     if (durationSeconds < minRequiredTime) {
       // Puan verilir ama flag atılır. Flag işlemi submit controller'ında yapılacağı için

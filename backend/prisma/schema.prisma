@@ -69,6 +69,10 @@ model User {
   referralCode      String           @unique @db.VarChar(10)
   referredByCode    String?          @db.VarChar(10)
 
+  timezone          String           @default("Europe/Istanbul") @db.VarChar(50)
+  dailyAdsWatched   Int              @default(0)
+  dailyQuestionsSolved Int           @default(0)
+
   subscriptionTier  SubscriptionTier @default(free)
   premiumExpiresAt  DateTime?
 
@@ -172,11 +176,11 @@ model DailyQuestionAssignment {
   date       DateTime       @db.Date
   module     QuestionModule
   questionId String
-  isSpecial  Boolean        @default(false)
+  isExtra    Boolean        @default(false)
 
   question   Question @relation(fields: [questionId], references: [id])
 
-  @@unique([date, module])
+  @@unique([date, module, isExtra])
   @@index([date])
 }
 
@@ -256,6 +260,8 @@ model SpecialEvent {
   id          String   @id @default(cuid())
   name        String   @db.VarChar(100)
   description String?
+  icon        String?  @db.VarChar(10)
+  colorHex    String?  @db.VarChar(7)
   startsAt    DateTime
   endsAt      DateTime
   isActive    Boolean  @default(false)
@@ -294,5 +300,6 @@ model AppConfig {
   minimum_version String   @default("1.0.0")
   latest_version  String   @default("1.0.0")
   force_update    Boolean  @default(false)
+  activeEventId   String?
   updatedAt       DateTime @updatedAt
 }

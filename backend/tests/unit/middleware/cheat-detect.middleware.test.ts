@@ -18,7 +18,8 @@ describe('CheatDetectMiddleware', () => {
 
   beforeEach(() => {
     mockRequest = {
-      params: { sessionId: 'session-1' }
+      params: { sessionId: 'session-1' },
+      body: { answers: ['a1', 'a2', 'a3', 'a4', 'a5'] }
     };
     // Tip hatasını önlemek için 'user'ı cast ederek ekliyoruz
     (mockRequest as any).user = { id: 'user-1' };
@@ -32,11 +33,12 @@ describe('CheatDetectMiddleware', () => {
     (prisma.gameSession.findUnique as jest.Mock).mockResolvedValue({
       userId: 'user-1',
       startedAt,
-      question: { answerCount: 5 } // 5 * 4 = 20s gerekli
+      question: { answerCount: 10 } // Eskiden answerCount kullanıyordu ama artık body.answers.length (5) kullanıyor
     });
 
     await cheatDetectMiddleware(mockRequest as Request, mockResponse as Response, nextFunction);
 
+    // 5 cevap * 4s = 20s gerekli. 10s geçtiği için suspicious olmalı.
     expect((mockRequest as any).isSuspicious).toBe(true);
     expect(nextFunction).toHaveBeenCalled();
   });
@@ -46,11 +48,12 @@ describe('CheatDetectMiddleware', () => {
     (prisma.gameSession.findUnique as jest.Mock).mockResolvedValue({
       userId: 'user-1',
       startedAt,
-      question: { answerCount: 5 } // 5 * 4 = 20s gerekli
+      question: { answerCount: 10 }
     });
 
     await cheatDetectMiddleware(mockRequest as Request, mockResponse as Response, nextFunction);
 
+    // 5 cevap * 4s = 20s gerekli. 30s geçtiği için suspicious olmamalı.
     expect((mockRequest as any).isSuspicious).toBeUndefined();
     expect(nextFunction).toHaveBeenCalled();
   });

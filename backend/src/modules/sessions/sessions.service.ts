@@ -101,9 +101,13 @@ export class SessionService {
     // 3. Cheat Detection
     let flagSuspicious = false;
     let suspiciousReason = null;
-    if (durationSeconds < question.answerCount * 4) {
+    
+    // Her cevap için en az 4 saniye kuralı (Örn: 10 cevap için min 40 saniye, 1 cevap için 4 saniye)
+    const minRequiredTime = submittedAnswers.length * 4;
+    
+    if (durationSeconds < minRequiredTime) {
       flagSuspicious = true;
-      suspiciousReason = 'Hızlı tamamlama (şüpheli)';
+      suspiciousReason = `Hızlı tamamlama: ${durationSeconds}s (Gereken: ${minRequiredTime}s)`;
     }
 
     // 4. Update Session

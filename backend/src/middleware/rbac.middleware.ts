@@ -6,9 +6,9 @@ import { AdminRole } from '@prisma/client';
 
 /**
  * Admin rolünü kontrol eder.
- * @param minRole Gereken minimum rol seviyesi
+ * @param allowedRoles Gereken minimum rol seviyesi veya izin verilen roller listesi
  */
-export const rbacMiddleware = (minRole: AdminRole) => {
+export const rbacMiddleware = (allowedRoles: AdminRole | AdminRole[]) => {
   const roleLevels: Record<AdminRole, number> = {
     super_admin: 3,
     editor: 2,
@@ -24,8 +24,14 @@ export const rbacMiddleware = (minRole: AdminRole) => {
 
     const adminRole = admin.role as AdminRole;
 
-    if (roleLevels[adminRole] < roleLevels[minRole]) {
-      return next(ApiError.forbidden('Bu işlem için yetkiniz yok'));
+    if (Array.isArray(allowedRoles)) {
+      if (!allowedRoles.includes(adminRole)) {
+        return next(ApiError.forbidden('Bu işlem için yetkiniz yok'));
+      }
+    } else {
+      if (roleLevels[adminRole] < roleLevels[allowedRoles]) {
+        return next(ApiError.forbidden('Bu işlem için yetkiniz yok'));
+      }
     }
 
     next();

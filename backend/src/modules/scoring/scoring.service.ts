@@ -61,10 +61,13 @@ export class ScoringService {
 
     // ADIM 1: Ham Puan (Position Scores)
     const positionScores = this.calculatePositionScores(totalAnswers, basePoints);
-    let scoreBase = 0;
+    let rawScoreBase = 0;
     correctRanks.forEach((rank) => {
-      scoreBase += positionScores.get(rank) || 0;
+      rawScoreBase += positionScores.get(rank) || 0;
     });
+    
+    // Veritabanı tutarlılığı için ham puanı tam sayıya yuvarla
+    const scoreBase = Math.floor(rawScoreBase);
 
     // ADIM 2: Süre Bonusu (Yalnızca tüm slotlar doluysa)
     let scoreTimeBonus = 0;
@@ -86,7 +89,7 @@ export class ScoringService {
     const scoreFinal = isAdMultiplied ? Math.floor(scoreDifficulty * 1.5) : scoreDifficulty;
 
     return {
-      scoreBase: Math.floor(scoreBase), // Floor base score for storage consistency
+      scoreBase,
       scoreTimeBonus,
       scoreDifficulty,
       scoreFinal,
