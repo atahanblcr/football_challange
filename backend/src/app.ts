@@ -12,6 +12,8 @@ import searchRouter from './modules/search/search.router';
 import questionsRouter from './modules/questions/questions.router';
 import sessionsRouter from './modules/sessions/sessions.router';
 import leaderboardRouter from './modules/leaderboard/leaderboard.router';
+import { adminRouter } from './modules/admin/admin.router';
+import { appConfigRouter } from './modules/app-config/app-config.router';
 
 const app = express();
 
@@ -31,6 +33,10 @@ app.use('/api/v1/search', searchRouter);
 app.use('/api/v1/questions', questionsRouter);
 app.use('/api/v1/sessions', sessionsRouter);
 app.use('/api/v1/leaderboard', leaderboardRouter);
+app.use('/api/v1/app', appConfigRouter);
+
+// Admin Route'ları (Ayrı prefix)
+app.use('/api/admin', adminRouter);
 
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 

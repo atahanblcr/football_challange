@@ -283,3 +283,12 @@ model AdminUser {
   @@index([email])
   @@index([role])
 }
+
+// UYGULAMA KONFİGÜRASYONU
+model AppConfig {
+  id              Int      @id @default(1)
+  minimum_version String   @default("1.0.0")
+  latest_version  String   @default("1.0.0")
+  force_update    Boolean  @default(false)
+  updatedAt       DateTime @updatedAt
+}

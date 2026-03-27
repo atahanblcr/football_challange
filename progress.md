@@ -1,18 +1,23 @@
 # PROJE İLERLEME RAPORU (PROGRESS)
 
 ## [2026-03-23] — FAZ 1: BACKEND CORE (TAMAMLANDI)
+- [x] Tüm modüller ve testler tamamlandı.
 
-### 1.1 - 1.8 Modülleri
-- [x] Auth, Users, Search, Questions, Sessions, Leaderboard modülleri tamamlandı.
-- [x] Cron Job'lar (Reset, Selector, Cleanup, Health, Archiver, Report) kodlandı.
+## [2026-03-26] — FAZ 2: ADMİN PANELİ (DEVAM EDİYOR)
 
-### 1.9 Test Maratonu (TAMAMLANDI)
-- [x] `tests/unit/scoring.test.ts` (8/8 geçti)
-- [x] `tests/questions/questions.test.ts` (4/4 geçti)
-- [x] `tests/sessions/sessions.test.ts` (5/5 geçti)
-- [x] `tests/leaderboard/leaderboard.test.ts` (3/3 geçti)
-- [x] Tüm modüller için %100 test coverage sağlandı (kritik path'ler).
+### 2.1 Backend Admin Modülleri (TAMAMLANDI)
+- [x] `admin-auth.middleware.ts` ve `rbac.middleware.ts` yazıldı.
+- [x] Admin, Entity, Question, User, Event, Stats modülleri backend'de tamamlandı.
+- [x] AppConfig modeli Prisma şemasına eklendi ve migration yapıldı.
+- [x] `super_admin` ve `AppConfig` için seed script'i çalıştırıldı.
+
+### 2.2 Admin Frontend Temel Yapı (TAMAMLANDI)
+- [x] Axios client ve QueryClient yapılandırıldı.
+- [x] Zustand ile Admin Auth Store oluşturuldu.
+- [x] Admin Layout ve Sidebar (Role-based) implemente edildi.
+- [x] Login sayfası ve ProtectedRoute hazır.
 
 ### Sıradaki Adım
-- [ ] Faz 2 — Admin Paneli başlangıcı.
-- [ ] Admin Auth ve Entity yönetimi ekranları.
+- [ ] 2.3 Dashboard ve İstatistik widget'ları.
+- [ ] 2.4 Soru Yönetimi (Drag-drop cevap listesi).
+- [ ] 2.5 Entity ve Kullanıcı listeleri.

@@ -7,6 +7,11 @@ interface TokenPayload {
   role?: string;
 }
 
+interface AdminTokenPayload {
+  adminId: string;
+  role: string;
+}
+
 export const jwtUtil = {
   generateAccessToken: (payload: TokenPayload): string => {
     return jwt.sign(payload, env.JWT_ACCESS_SECRET, {
@@ -26,5 +31,15 @@ export const jwtUtil = {
 
   verifyRefreshToken: (token: string): TokenPayload => {
     return jwt.verify(token, env.JWT_REFRESH_SECRET) as TokenPayload;
+  },
+
+  generateAdminSessionToken: (payload: AdminTokenPayload): string => {
+    return jwt.sign(payload, env.ADMIN_SESSION_SECRET, {
+      expiresIn: '24h' // Admin session lasts 24 hours
+    });
+  },
+
+  verifyAdminSessionToken: (token: string): AdminTokenPayload => {
+    return jwt.verify(token, env.ADMIN_SESSION_SECRET) as AdminTokenPayload;
   }
 };

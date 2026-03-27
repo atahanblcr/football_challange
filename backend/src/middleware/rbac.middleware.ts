@@ -4,20 +4,27 @@ import { ApiError } from '../errors/api-error';
 import { AdminRole } from '@prisma/client';
 
 /**
- * Rol tabanlı yetkilendirme (RBAC) middleware'i.
- * Belirli rollerin belirli endpoint'lere erişimini kısıtlar.
+ * Admin rolünü kontrol eder.
+ * @param minRole Gereken minimum rol seviyesi
  */
-export const rbacMiddleware = (allowedRoles: AdminRole[]) => {
+export const rbacMiddleware = (minRole: AdminRole) => {
+  const roleLevels: Record<AdminRole, number> = {
+    super_admin: 3,
+    editor: 2,
+    moderator: 1
+  };
+
   return (req: Request, _res: Response, next: NextFunction) => {
-    // Admin yetkisi için 'adminUser' request nesnesinde olmalı (AdminAuthMiddleware tarafından eklenir)
-    const admin = (req as any).adminUser;
+    const admin = (req as any).admin;
 
     if (!admin) {
-      return next(ApiError.unauthorized());
+      return next(ApiError.unauthorized('Admin oturumu bulunamadı'));
     }
 
-    if (!allowedRoles.includes(admin.role)) {
-      return next(ApiError.forbidden('Bu işlem için yetkiniz yetersiz'));
+    const adminRole = admin.role as AdminRole;
+
+    if (roleLevels[adminRole] < roleLevels[minRole]) {
+      return next(ApiError.forbidden('Bu işlem için yetkiniz yok'));
     }
 
     next();
