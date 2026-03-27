@@ -1,31 +1,29 @@
 # PROJE İLERLEME RAPORU (PROGRESS)
 
-## [2026-03-23] — FAZ 1: BACKEND CORE (TAMAMLANDI)
-- [x] Tüm modüller ve testler tamamlandı.
+## [2026-03-27] — FAZ 1 & 2: KRİTİK DÜZELTMELER (DEVAM EDİYOR)
 
-## [2026-03-27] — FAZ 2: ADMİN PANELİ (TAMAMLANDI)
+### 2.5 Gemini Raporu Düzeltmeleri (TAMAMLANDI)
+- [x] `DailyQuestionAssignment` unique constraint `isExtra` alanını kapsayacak şekilde güncellendi.
+- [x] `User` modeline `timezone`, `dailyAdsWatched`, `dailyQuestionsSolved` alanları eklendi.
+- [x] `SpecialEvent` modeline `icon` ve `colorHex` alanları eklendi.
+- [x] `AppConfig` modeline `activeEventId` eklendi.
+- [x] `ScoringService` puan yuvarlama mantığı (scoreBase floor) veritabanı ile senkronize edildi.
+- [x] Hile tespiti (Cheat Detect) "girilen cevap sayısı * 4s" kuralına göre esnetildi.
 
-### 2.1 Backend Admin Modülleri (TAMAMLANDI)
-- [x] Admin, Entity, Question, User, Event, Stats modülleri backend'de tamamlandı.
-- [x] `AdminUser` modeline `createdBy` alanı eklendi.
-- [x] `QuestionAnswer` tablosuna `CHECK (rank > 0)` kısıtlaması eklendi.
-- [x] Full-Text Search (GIN) index'leri doğrulandı.
+### 2.6 Test ve Stabilizasyon (SORUNLU)
+- [x] `sessions.test.ts` - BAŞARILI
+- [x] `scoring.test.ts` (Yeni yuvarlama mantığına göre güncellendi) - BAŞARILI
+- [ ] `rate-limit.test.ts` - HATA (Redis Mock TypeError)
+- [ ] `rbac.middleware.test.ts` - HATA (Property mismatch)
+- [ ] `search.test.ts` - HATA (Turkish case-insensitivity issue)
+- [ ] `leaderboard.test.ts` - HATA (Prisma MaxClients pool limit)
 
-### 2.2 Güvenlik ve Hardening (TAMAMLANDI)
-- [x] Helmet ve CORS sıkılaştırması yapıldı.
-- [x] JSON Payload limitleri (10kb) eklendi.
-- [x] Admin Login için Rate Limiting (5 istek / 15 dk) aktif edildi.
-- [x] `ioredis-mock` ile test ortamı stabilize edildi.
-
-### 2.3 Admin Frontend (TAMAMLANDI)
-- [x] Tüm yönetim sayfaları (Soru, Entity, Kullanıcı, Etkinlik, İstatistik, Ayarlar) implemente edildi.
-- [x] Soru Takvimi ve Düzenleme ekranları rehbere uygun hale getirildi.
-- [x] `UserDetailModal` ile şüpheli oturum takibi eklendi.
-
-### 2.4 Test ve Doğrulama (TAMAMLANDI)
-- [x] Backend Admin entegrasyon testleri (`tests/admin/*.test.ts`) yazıldı ve geçti.
-- [x] Backend Güvenlik testleri (`tests/security/*.test.ts`) yazıldı ve geçti.
-- [x] Frontend birim testleri (Vitest) ile kritik logic'ler doğrulandı.
+### Kritik Hatalar ve Düzeltmeler (Log)
+- **Schema Fix:** `DailyQuestionAssignment` unique constraint `[date, module, isExtra]` olarak güncellendi. Reklam izleme senaryosu kurtarıldı.
+- **Scoring Fix:** `scoreBase` ondalıklı haliyle zorluk çarpanına giriyordu, artık floor(scoreBase) kullanılıyor.
+- **Git Push:** Tüm düzeltmeler (11 dosya) repoya pushlandı.
 
 ### Sıradaki Adım
-- [ ] FAZ 3: Flutter Mobil Uygulama — Core Altyapı Kurulumu.
+- [ ] Geçmeyen middleware ve entegrasyon testlerinin tamiri.
+- [ ] Prisma test pooling ayarları.
+- [ ] Faz 3: Flutter Mobil Uygulama başlangıcı.
