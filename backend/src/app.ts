@@ -4,6 +4,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { env } from './config/env';
+import { redis } from './config/redis';
 import { errorHandlerMiddleware } from './middleware/error-handler.middleware';
 import { startAllJobs } from './jobs';
 import authRouter from './modules/auth/auth.router';
@@ -17,11 +18,23 @@ import { appConfigRouter } from './modules/app-config/app-config.router';
 
 const app = express();
 
+app.set('trust proxy', 1);
+
 // Güvenlik middleware'leri
 app.use(helmet());
 app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS?.split(',') ?? '*',
+  origin: (origin, callback) => {
+    const allowedOrigins = env.ALLOWED_ORIGINS?.split(',') ?? [];
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS: İzin verilmeyen kaynak'));
+    }
+  },
   credentials: true,
+  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-admin-session'],
+  exposedHeaders: ['X-RateLimit-Limit', 'X-RateLimit-Remaining'],
 }));
 app.use(morgan('combined'));
 app.use(express.json({ limit: '10kb' }));

@@ -7,21 +7,22 @@ import { adminEventsRouter } from './events/admin-events.router';
 import { adminQuestionsRouter } from './questions/admin-questions.router';
 import { adminStatsRouter } from './stats/admin-stats.router';
 import { adminUsersRouter } from './users/admin-users.router';
+import { adminAdminsController } from './admins/admin-admins.controller';
+import { rateLimitMiddleware } from '../../middleware/rate-limit.middleware';
 
 const router = Router();
 
-/**
- * Tüm /api/admin/* route'larını toplar.
- * Bazı route'lar (login gibi) auth gerektirmez, 
- * diğerleri adminAuthMiddleware ile korunur.
- */
+// 1. PUBLIC ADMIN ROUTES (No Auth)
+router.post('/auth/login', rateLimitMiddleware(5, 15 * 60), adminAdminsController.login);
 
-// Auth gerektirmeyen admin route'ları (Login vb. admins router içinde tanımlı olmalı)
-router.use('/auth', adminAdminsRouter);
-
-// Auth gerektiren tüm admin modülleri
+// 2. PROTECTED ADMIN ROUTES (Auth Required)
 router.use(adminAuthMiddleware);
 
+// Auth Module (Protected parts)
+router.get('/auth/me', adminAdminsController.me);
+router.post('/auth/logout', adminAdminsController.logout);
+
+// Other Modules
 router.use('/admins', adminAdminsRouter);
 router.use('/entities', adminEntitiesRouter);
 router.use('/events', adminEventsRouter);

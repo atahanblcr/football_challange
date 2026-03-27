@@ -277,6 +277,10 @@ model AdminUser {
   role         AdminRole @default(moderator)
   isActive     Boolean   @default(true)
 
+  createdById  String?
+  createdBy    AdminUser?  @relation("AdminCreator", fields: [createdById], references: [id])
+  createdAdmins AdminUser[] @relation("AdminCreator")
+
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 

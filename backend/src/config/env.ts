@@ -20,6 +20,7 @@ const envSchema = z.object({
   PORT: z.string().transform(Number).default('3000'),
   STORAGE_CDN_BASE_URL: z.string().url(),
   GOOGLE_CLIENT_ID: z.string().optional(),
+  ALLOWED_ORIGINS: z.string().optional().default(''),
 });
 
 const parsed = envSchema.safeParse(process.env);

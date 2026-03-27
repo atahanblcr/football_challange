@@ -12,7 +12,8 @@ import { ErrorCode } from '../errors/error-codes';
 export const rateLimitMiddleware = (limit: number, windowSeconds: number) => {
   return async (req: Request, _res: Response, next: NextFunction) => {
     const ip = req.ip || req.socket.remoteAddress || 'unknown';
-    const endpoint = req.baseUrl + req.path;
+    const endpoint = req.originalUrl || (req.baseUrl + req.path);
+    console.log(`[RateLimit] IP: ${ip}, Endpoint: ${endpoint}, BaseUrl: ${req.baseUrl}, Path: ${req.path}`);
     const key = redisKeys.rateLimit(ip, endpoint);
 
     try {

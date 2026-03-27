@@ -6,11 +6,6 @@ import { AdminRole } from '@prisma/client';
 
 const router = Router();
 
-// /api/admin/auth/* altındaki route'lar
-router.post('/login', adminAdminsController.login);
-router.get('/me', adminAdminsController.me);
-router.post('/logout', adminAdminsController.logout);
-
 // /api/admin/admins/* altındaki route'lar (sadece super_admin)
 router.get('/', rbacMiddleware(AdminRole.super_admin), adminAdminsController.getAll);
 router.post('/', rbacMiddleware(AdminRole.super_admin), adminAdminsController.create);

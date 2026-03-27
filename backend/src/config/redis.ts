@@ -1,17 +1,25 @@
-// src/config/redis.ts
 import { Redis } from 'ioredis';
 import { env } from './env';
 
-// Geliştirme ortamında UPSTASH_REDIS_REST_URL 'redis://' ile başlıyorsa ioredis kullanılır.
-// Production'da Upstash HTTP API için upstash/redis paketi gerekebilir 
-// ama şimdilik ioredis ile devam ediyoruz (Upstash Redis'i de destekler).
+const isTest = env.NODE_ENV === 'test';
 
-export const redis = new Redis(env.UPSTASH_REDIS_REST_URL);
+// Redis bağlantı ayarları
+const redisOptions = {
+  // Bağlantı koparsa veya testlerde yavaşsa bekletme süresi
+  connectTimeout: 10000,
+  maxRetriesPerRequest: isTest ? 3 : 20,
+  retryStrategy: (times: number) => {
+    if (isTest && times > 3) return null; // Testlerde çok fazla deneme yapma
+    return Math.min(times * 50, 2000);
+  }
+};
 
-redis.on('error', (err) => {
-  console.error('Redis Bağlantı Hatası:', err);
-});
+export const redis = new Redis(env.UPSTASH_REDIS_REST_URL, redisOptions);
 
 redis.on('connect', () => {
-  console.log('Redis Bağlantısı Başarılı');
+  if (!isTest) console.log('[Redis] Bağlantısı Başarılı');
+});
+
+redis.on('error', (err) => {
+  if (!isTest) console.error('[Redis] Hatası:', err);
 });
