@@ -14,13 +14,13 @@ import { Login } from '@/pages/Login';
 import { Dashboard } from '@/pages/Dashboard';
 import { QuestionList } from '@/pages/questions/QuestionList';
 import { QuestionCreate } from '@/pages/questions/QuestionCreate';
+import { EntityList } from '@/pages/entities/EntityList';
+import { UserList } from '@/pages/users/UserList';
+import { EventList } from '@/pages/events/EventList';
 
 // Placeholder Pages (Temporary)
 const QuestionEdit = () => <div className="p-6"><h1>Soru Düzenle</h1><p>Geliştirme aşamasında...</p></div>;
 const QuestionCalendar = () => <div className="p-6"><h1>Soru Takvimi</h1><p>Geliştirme aşamasında...</p></div>;
-const EntityList = () => <div className="p-6"><h1>Entityler</h1><p>Geliştirme aşamasında...</p></div>;
-const UserList = () => <div className="p-6"><h1>Kullanıcılar</h1><p>Geliştirme aşamasında...</p></div>;
-const EventList = () => <div className="p-6"><h1>Etkinlikler</h1><p>Geliştirme aşamasında...</p></div>;
 const StatsPage = () => <div className="p-6"><h1>İstatistikler</h1><p>Geliştirme aşamasında...</p></div>;
 const SettingsPage = () => <div className="p-6"><h1>Ayarlar</h1><p>Geliştirme aşamasında...</p></div>;
 
