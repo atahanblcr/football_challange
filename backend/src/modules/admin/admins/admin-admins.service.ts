@@ -3,6 +3,7 @@ import { prisma } from '../../../config/database';
 import { bcryptUtil } from '../../../utils/bcrypt.util';
 import { jwtUtil } from '../../../utils/jwt.util';
 import { ApiError } from '../../../errors/api-error';
+import { ErrorCode } from '../../../errors/error-codes';
 import { AdminRole, AdminUser } from '@prisma/client';
 
 export const adminAdminsService = {
@@ -12,7 +13,7 @@ export const adminAdminsService = {
     });
 
     if (!admin) {
-      throw ApiError.unauthorized('Geçersiz e-posta veya şifre');
+      throw ApiError.unauthorized(ErrorCode.INVALID_CREDENTIALS, 'Geçersiz e-posta veya şifre');
     }
 
     if (!admin.isActive) {
@@ -21,7 +22,7 @@ export const adminAdminsService = {
 
     const isPasswordValid = await bcryptUtil.compare(password, admin.passwordHash);
     if (!isPasswordValid) {
-      throw ApiError.unauthorized('Geçersiz e-posta veya şifre');
+      throw ApiError.unauthorized(ErrorCode.INVALID_CREDENTIALS, 'Geçersiz e-posta veya şifre');
     }
 
     const sessionToken = jwtUtil.generateAdminSessionToken({
@@ -58,7 +59,7 @@ export const adminAdminsService = {
     });
 
     if (existing) {
-      throw ApiError.conflict('Bu e-posta adresi zaten kullanımda');
+      throw ApiError.conflict(ErrorCode.EMAIL_TAKEN, 'Bu e-posta adresi zaten kullanımda');
     }
 
     const hashedPassword = await bcryptUtil.hash(data.passwordHash);

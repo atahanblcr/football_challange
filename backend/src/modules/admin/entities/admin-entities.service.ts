@@ -2,6 +2,7 @@
 import { prisma } from '../../../config/database';
 import { EntityType, Prisma } from '@prisma/client';
 import { ApiError } from '../../../errors/api-error';
+import { ErrorCode } from '../../../errors/error-codes';
 import { normalizeText } from '../../../utils/normalize-text.util';
 
 export const adminEntitiesService = {
@@ -110,7 +111,7 @@ export const adminEntitiesService = {
     });
 
     if (usageCount > 0) {
-      throw ApiError.badRequest(`Bu entity ${usageCount} soruda kullanılıyor. Önce sorulardan çıkarılmalı veya soru silinmeli.`);
+      throw ApiError.badRequest(ErrorCode.VALIDATION_ERROR, `Bu entity ${usageCount} soruda kullanılıyor. Önce sorulardan çıkarılmalı veya soru silinmeli.`);
     }
 
     return prisma.entity.delete({

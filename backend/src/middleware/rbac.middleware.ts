@@ -1,6 +1,7 @@
 // src/middleware/rbac.middleware.ts
 import { Request, Response, NextFunction } from 'express';
 import { ApiError } from '../errors/api-error';
+import { ErrorCode } from '../errors/error-codes';
 import { AdminRole } from '@prisma/client';
 
 /**
@@ -18,7 +19,7 @@ export const rbacMiddleware = (minRole: AdminRole) => {
     const admin = (req as any).admin;
 
     if (!admin) {
-      return next(ApiError.unauthorized('Admin oturumu bulunamadı'));
+      return next(ApiError.unauthorized(ErrorCode.UNAUTHORIZED, 'Admin oturumu bulunamadı'));
     }
 
     const adminRole = admin.role as AdminRole;

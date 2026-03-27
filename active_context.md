@@ -1,18 +1,18 @@
 # AKTİF ÇALIŞMA BAĞLAMI (ACTIVE CONTEXT)
 
-**Şu Anki Faz:** Faz 2 — Admin Paneli
-**Şu Anki Görev:** 2.2 — Admin Frontend Temel Yapı (Tamamlandı)
+**Şu Anki Faz:** Faz 2 — Admin Paneli (Tamamlandı)
+**Şu Anki Görev:** 2.6 — Faz 2 Final Kontrol ve Doğrulama
 
 ## Mevcut Odak Noktası
-- Backend Admin modülleri (CRUD ve Auth) tamamlandı.
-- Admin Panel React projesinin temel mimarisi (Axios, QueryClient, Auth Store, Layout, ProtectedRoute) kuruldu.
-- İlk super_admin kullanıcısı ve AppConfig seeded edildi.
+- Admin Panel'in tüm sayfaları, hookları ve testleri tamamlandı.
+- Proje Faz 3'e (Flutter) geçiş için hazır.
 
 ## Son Yapılan İşlem
-- `admin/src/App.tsx` ve `admin/src/pages/Login.tsx` implementasyonu tamamlandı.
-- Admin login akışı uçtan uca hazır.
+- Missing sayfalar (`QuestionEdit`, `QuestionCalendar`, `StatsPage`, `SettingsPage`) implemente edildi.
+- `UserDetailModal` kullanıcı listesine entegre edildi.
+- `QuestionEdit` sayfası için Vitest birim testi yazıldı ve doğrulandı.
+- Tüm admin kodları GitHub'a pushlanmaya hazır.
 
 ## Sıradaki Adımlar
-1. Dashboard sayfasının implementasyonu (2.3).
-2. Soru yönetimi ekranları (2.4).
-3. Entity, Kullanıcı ve Etkinlik yönetimi ekranları (2.5).
+1. Faz 3 — Flutter Mobil Uygulama başlangıcı (Core Katman).
+2. `SKILL_FLUTTER_ARCHITECTURE.md` okunması ve altyapının kurulması.
