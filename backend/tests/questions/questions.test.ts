@@ -67,10 +67,11 @@ describe('Questions Integration Tests', () => {
         .set('Authorization', `Bearer ${userToken}`);
 
       expect(response.status).toBe(200);
-      expect(Array.isArray(response.body)).toBe(true);
-      expect(response.body.length).toBeGreaterThanOrEqual(1);
+      expect(response.body.status).toBe('success');
+      expect(Array.isArray(response.body.data)).toBe(true);
+      expect(response.body.data.length).toBeGreaterThanOrEqual(1);
       
-      const q = response.body[0];
+      const q = response.body.data[0];
       expect(q).toHaveProperty('id');
       expect(q).toHaveProperty('module', 'players');
       expect(q).not.toHaveProperty('title'); // Should NOT return title (anti-cheat)
@@ -91,9 +92,10 @@ describe('Questions Integration Tests', () => {
         .set('Authorization', `Bearer ${userToken}`);
 
       expect(response.status).toBe(200);
-      expect(response.body.id).toBe(q?.id);
-      expect(response.body).toHaveProperty('difficulty');
-      expect(response.body).not.toHaveProperty('title');
+      expect(response.body.status).toBe('success');
+      expect(response.body.data.id).toBe(q?.id);
+      expect(response.body.data).toHaveProperty('difficulty');
+      expect(response.body.data).not.toHaveProperty('title');
     });
 
     it('should return 404 for non-existent question', async () => {

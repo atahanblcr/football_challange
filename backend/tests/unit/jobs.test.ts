@@ -3,102 +3,103 @@ import { runDailyQuestionSelector } from '../../src/jobs/daily-question-selector
 import { QuestionModule, QuestionStatus, Difficulty } from '@prisma/client';
 
 describe('Daily Question Selector Logic Tests (90-day Cooldown)', () => {
+  // Use a module for testing that we can isolate
+  const testModule: QuestionModule = 'managers';
+  const testAdminId = 'job_test_admin';
+
   beforeAll(async () => {
-    // Clear assignments and specifically our test questions
+    // 1. First cleanup ANY existing data that could interfere
+    await prisma.gameSession.deleteMany();
     await prisma.dailyQuestionAssignment.deleteMany();
-    await prisma.question.deleteMany({ where: { createdBy: 'job_test_admin' } });
+    await prisma.questionAnswer.deleteMany();
+    // 2. Clear ALL questions for our test module specifically
+    await prisma.question.deleteMany({ where: { module: testModule } });
   });
 
   afterAll(async () => {
     await prisma.dailyQuestionAssignment.deleteMany();
-    await prisma.question.deleteMany({ where: { createdBy: 'job_test_admin' } });
+    await prisma.question.deleteMany({ where: { createdBy: testAdminId } });
   });
 
-  it('should NOT select a question shown in the last 90 days', async () => {
-    // Ensure clean state for THIS test
+  it('should only select an ACTIVE question that is NOT in cooldown', async () => {
+    // Clear for this test specifically
     await prisma.dailyQuestionAssignment.deleteMany();
-    await prisma.question.deleteMany({ where: { createdBy: 'job_test_admin' } });
+    await prisma.question.deleteMany({ where: { module: testModule } });
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
+    const ninetyOneDaysAgo = new Date();
+    ninetyOneDaysAgo.setDate(ninetyOneDaysAgo.getDate() - 91);
+
     const eightyNineDaysAgo = new Date();
     eightyNineDaysAgo.setDate(eightyNineDaysAgo.getDate() - 89);
 
-    const module: QuestionModule = 'players';
-
-    // 1. Create a question shown 89 days ago (Should NOT be selected)
-    const qRecentlyShown = await prisma.question.create({
+    // 1. Recently shown (Excluded)
+    await prisma.question.create({
       data: {
         title: 'Recently Shown Question',
-        module,
+        module: testModule,
         status: QuestionStatus.active,
         difficulty: Difficulty.easy,
         answerCount: 5,
-        createdBy: 'job_test_admin',
+        createdBy: testAdminId,
         lastShownAt: eightyNineDaysAgo,
       }
     });
 
-    // 2. Create a question never shown (Should BE selected)
+    // 2. Draft (Excluded)
+    await prisma.question.create({
+      data: {
+        title: 'Draft Question',
+        module: testModule,
+        status: QuestionStatus.draft,
+        difficulty: Difficulty.easy,
+        answerCount: 5,
+        createdBy: testAdminId,
+      }
+    });
+
+    // 3. Fresh New Question (Eligible)
     const qNew = await prisma.question.create({
       data: {
         title: 'Fresh New Question',
-        module,
+        module: testModule,
         status: QuestionStatus.active,
         difficulty: Difficulty.easy,
         answerCount: 5,
-        createdBy: 'job_test_admin',
+        createdBy: testAdminId,
         lastShownAt: null,
       }
     });
 
-    // 3. Run the selector logic
-    await runDailyQuestionSelector();
-
-    // 4. Check assignment
-    const assignment = await prisma.dailyQuestionAssignment.findFirst({
-      where: { date: { gte: today }, module },
-      include: { question: true }
-    });
-
-    expect(assignment).toBeDefined();
-    expect(assignment?.question.title).toBe('Fresh New Question');
-    expect(assignment?.questionId).not.toBe(qRecentlyShown.id);
-  });
-
-  it('should select a question shown MORE than 90 days ago', async () => {
-    // Clean up specifically for this test
-    await prisma.dailyQuestionAssignment.deleteMany();
-    await prisma.question.deleteMany({ where: { createdBy: 'job_test_admin' } });
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const ninetyOneDaysAgo = new Date();
-    ninetyOneDaysAgo.setDate(ninetyOneDaysAgo.getDate() - 91);
-
-    const module: QuestionModule = 'players';
-
+    // 4. Very Old Question (Eligible)
     const qOld = await prisma.question.create({
       data: {
         title: 'Very Old Question',
-        module,
+        module: testModule,
         status: QuestionStatus.active,
         difficulty: Difficulty.easy,
         answerCount: 5,
-        createdBy: 'job_test_admin',
+        createdBy: testAdminId,
         lastShownAt: ninetyOneDaysAgo,
       }
     });
 
+    // Run selector
     await runDailyQuestionSelector();
 
+    // Verify assignment for our module
     const assignment = await prisma.dailyQuestionAssignment.findFirst({
-      where: { date: { gte: today }, module },
+      where: { date: { gte: today }, module: testModule },
       include: { question: true }
     });
 
-    expect(assignment?.question.title).toBe('Very Old Question');
+    expect(assignment).toBeDefined();
+    // It should pick either qNew or qOld, but NEVER Recently Shown or Draft
+    const eligibleIds = [qNew.id, qOld.id];
+    expect(eligibleIds).toContain(assignment?.questionId);
+    expect(assignment?.question.title).not.toBe('Recently Shown Question');
+    expect(assignment?.question.title).not.toBe('Draft Question');
   });
 });

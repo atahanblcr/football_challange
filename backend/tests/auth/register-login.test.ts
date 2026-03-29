@@ -16,7 +16,7 @@ describe('Auth Module (Email)', () => {
 
   it('should register a new user', async () => {
     const response = await request(app)
-      .post('/api/v1/auth/register')
+      .post('/api/v1/auth/email/register')
       .send(testUser);
 
     expect(response.status).toBe(201);
@@ -26,7 +26,7 @@ describe('Auth Module (Email)', () => {
 
   it('should not register with same email', async () => {
     const response = await request(app)
-      .post('/api/v1/auth/register')
+      .post('/api/v1/auth/email/register')
       .send(testUser);
 
     expect(response.status).toBe(409);
@@ -35,7 +35,7 @@ describe('Auth Module (Email)', () => {
 
   it('should login with correct credentials', async () => {
     const response = await request(app)
-      .post('/api/v1/auth/login')
+      .post('/api/v1/auth/email/login')
       .send({
         email: testUser.email,
         password: testUser.password
@@ -47,7 +47,7 @@ describe('Auth Module (Email)', () => {
 
   it('should not login with wrong password', async () => {
     const response = await request(app)
-      .post('/api/v1/auth/login')
+      .post('/api/v1/auth/email/login')
       .send({
         email: testUser.email,
         password: 'wrong-password'
