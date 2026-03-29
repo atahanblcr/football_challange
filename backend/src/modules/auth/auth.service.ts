@@ -17,16 +17,17 @@ export class AuthService {
   async register(data: any) {
     const { email, password, nickname, referredByCode } = data;
 
-    // Email ve Nickname kontrolü
-    const existingUser = await prisma.user.findFirst({
-      where: { OR: [{ email }, { nickname }] }
+    // Email kontrolü
+    const existingUser = await prisma.user.findUnique({
+      where: { email }
     });
 
     if (existingUser) {
-      if (existingUser.email === email) throw ApiError.conflict(ErrorCode.EMAIL_TAKEN, 'E-posta adresi zaten kullanımda');
-      if (existingUser.nickname === nickname) throw ApiError.conflict(ErrorCode.NICKNAME_TAKEN, 'Bu nickname zaten alınmış');
+      throw ApiError.conflict(ErrorCode.EMAIL_TAKEN, 'E-posta adresi zaten kullanımda');
     }
 
+    // Eğer nickname gelmediyse (onboarding akışı), geçici bir tane oluştur
+    const finalNickname = nickname || `user_${Math.random().toString(36).substring(2, 9)}`;
     const passwordHash = await bcryptUtil.hash(password);
     const referralCode = referralCodeUtil.generate();
 
@@ -34,7 +35,7 @@ export class AuthService {
       data: {
         email,
         passwordHash,
-        nickname,
+        nickname: finalNickname,
         referralCode,
         referredByCode,
         authProvider: 'email',

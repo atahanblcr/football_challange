@@ -79,7 +79,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         Text(
                           item.icon,
                           style: const TextStyle(fontSize: 100),
-                        ).animate().scale(duration: 600.ms, curve: Curves.backOut),
+                        ).animate().scale(duration: 600.ms, curve: Curves.easeOutBack),
                         const SizedBox(height: 48),
                         Text(
                           item.title,

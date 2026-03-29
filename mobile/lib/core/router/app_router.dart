@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/auth/presentation/login_screen.dart';
+import '../../features/auth/presentation/register_screen.dart';
 import '../../features/auth/presentation/nickname_screen.dart';
 import '../../features/auth/presentation/avatar_country_screen.dart';
 import '../../features/auth/presentation/ban_screen.dart';
@@ -37,12 +38,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final loc = state.matchedLocation;
 
       if (!isAuth) {
-        if (loc == RouteNames.splash || loc == RouteNames.onboarding || loc == RouteNames.login) return null;
+        if (loc == RouteNames.splash || loc == RouteNames.onboarding || loc == RouteNames.login || loc == RouteNames.register) return null;
         return RouteNames.login;
       }
 
-      if (needsNickname && loc != RouteNames.nickname) return RouteNames.nickname;
-      if (!needsNickname && needsAvatar && loc != RouteNames.avatarCountry) return RouteNames.avatarCountry;
+      if (needsNickname && loc != RouteNames.nickname && loc != RouteNames.avatarCountry) return RouteNames.nickname;
+      if (needsAvatar && loc != RouteNames.avatarCountry && loc != RouteNames.nickname) return RouteNames.avatarCountry;
 
       if (isAuth && (loc == RouteNames.login || loc == RouteNames.splash)) return RouteNames.home;
 
@@ -51,9 +52,26 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(path: RouteNames.splash, builder: (_, __) => const SplashScreen()),
       GoRoute(path: RouteNames.onboarding, builder: (_, __) => const OnboardingScreen()),
-      GoRoute(path: RouteNames.login, builder: (_, __) => const LoginScreen()),
-      GoRoute(path: RouteNames.nickname, builder: (_, __) => const NicknameScreen()),
-      GoRoute(path: RouteNames.avatarCountry, builder: (_, __) => const AvatarCountryScreen()),
+      GoRoute(
+        name: 'login',
+        path: RouteNames.login, 
+        builder: (_, __) => const LoginScreen(),
+      ),
+      GoRoute(
+        name: 'register',
+        path: RouteNames.register, 
+        builder: (_, __) => const RegisterScreen(),
+      ),
+      GoRoute(
+        name: 'nickname',
+        path: RouteNames.nickname, 
+        builder: (_, __) => const NicknameScreen(),
+      ),
+      GoRoute(
+        name: 'avatarCountry',
+        path: RouteNames.avatarCountry, 
+        builder: (_, __) => const AvatarCountryScreen(),
+      ),
       GoRoute(path: RouteNames.forceUpdate, builder: (_, __) => const ForceUpdateScreen()),
       GoRoute(path: RouteNames.banned, builder: (_, __) => const BanScreen()),
 

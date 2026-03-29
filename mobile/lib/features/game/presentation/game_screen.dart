@@ -34,8 +34,15 @@ class GameScreen extends ConsumerWidget {
       buttonState = isFull ? FinishButtonState.allFilled : FinishButtonState.active;
     }
 
-    return WillPopScope(
-      onWillPop: () async => await _showExitDialog(context) ?? false,
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (didPop) return;
+        final shouldPop = await _showExitDialog(context);
+        if (shouldPop == true && context.mounted) {
+          context.go(RouteNames.home);
+        }
+      },
       child: Scaffold(
         backgroundColor: AppColors.background,
         body: SafeArea(

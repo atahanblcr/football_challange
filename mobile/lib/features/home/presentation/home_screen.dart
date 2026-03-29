@@ -7,6 +7,7 @@ import '../../../core/constants/app_text_styles.dart';
 import '../../../core/router/route_names.dart';
 import '../../../shared/widgets/error_screen_widget.dart';
 import '../../../shared/widgets/loading_widget.dart';
+import '../../auth/data/auth_repository.dart';
 import 'home_provider.dart';
 import 'widgets/module_card_widget.dart';
 import 'widgets/special_event_banner_widget.dart';
@@ -51,10 +52,21 @@ class HomeScreen extends ConsumerWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Günaydın, 👋', style: AppTextStyles.bodySmall),
-                          const Text('EfsaneForvet', style: AppTextStyles.titleMedium),
+                          const Text('Günaydın, 👋', style: AppTextStyles.bodySmall),
+                          Consumer(
+                            builder: (context, ref, _) {
+                              return FutureBuilder<String>(
+                                future: ref.read(authRepositoryProvider).getMe().then((u) => u.nickname),
+                                builder: (context, snapshot) => Text(
+                                  snapshot.data ?? '...',
+                                  style: AppTextStyles.titleMedium,
+                                ),
+                              );
+                            },
+                          ),
                         ],
                       ),
+
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
@@ -83,8 +95,19 @@ class HomeScreen extends ConsumerWidget {
             ),
           ),
 
-          // Grid
-          SliverPadding(
+          if (questions.isEmpty)
+            const SliverFillRemaining(
+              child: Center(
+                child: Text(
+                  'Henüz soru atanmamış!\nLütfen daha sonra tekrar deneyin.',
+                  textAlign: TextAlign.center,
+                  style: AppTextStyles.bodyMedium,
+                ),
+              ),
+            )
+          else
+            // Grid
+            SliverPadding(
             padding: const EdgeInsets.all(24),
             sliver: SliverGrid(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(

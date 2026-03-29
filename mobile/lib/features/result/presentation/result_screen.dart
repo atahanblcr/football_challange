@@ -45,7 +45,7 @@ class ResultScreen extends ConsumerWidget {
           const SizedBox(height: 32),
           
           ScoreCounterWidget(score: result.scoreFinal)
-              .animate().scale(duration: 600.ms, curve: Curves.backOut),
+              .animate().scale(duration: 600.ms, curve: Curves.easeOutBack),
           
           const SizedBox(height: 32),
           

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
+import '../../../core/router/route_names.dart';
 import '../../../shared/widgets/primary_button_widget.dart';
 import '../../../shared/providers/auth_provider.dart';
 
@@ -60,7 +62,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 const Text(
                   '⚽',
                   style: TextStyle(fontSize: 80),
-                ).animate().scale(duration: 600.ms, curve: Curves.backOut),
+                ).animate().scale(duration: 600.ms, curve: Curves.easeOutBack),
                 
                 const SizedBox(height: 24),
                 
@@ -115,6 +117,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                     ),
                   ).animate().fadeIn(delay: 1000.ms),
+
+                  const SizedBox(height: 16),
+
+                  TextButton(
+                    onPressed: () => context.push(RouteNames.register),
+                    child: const Text(
+                      'Hesabın yok mu? Kayıt Ol',
+                      style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
+                    ),
+                  ).animate().fadeIn(delay: 1200.ms),
                 ] else ...[
                   // Email Login Form
                   Column(
@@ -136,6 +148,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         label: 'Giriş Yap',
                         isLoading: authState.isLoading,
                         onPressed: _loginEmail,
+                      ),
+                      const SizedBox(height: 16),
+                      Center(
+                        child: TextButton(
+                          onPressed: () => context.push(RouteNames.register),
+                          child: const Text(
+                            'Hesabın yok mu? Kayıt Ol',
+                            style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
+                          ),
+                        ),
                       ),
                       TextButton(
                         onPressed: () => setState(() => _showEmailForm = false),

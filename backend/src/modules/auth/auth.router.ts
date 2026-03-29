@@ -11,8 +11,8 @@ const controller = new AuthController();
 // Auth endpoint'leri için rate limit (15 dakikada 10 istek)
 const authRateLimit = rateLimitMiddleware(10, 15 * 60);
 
-router.post('/register', authRateLimit, validate(registerSchema), controller.register);
-router.post('/login', authRateLimit, validate(loginSchema), controller.login);
+router.post('/email/register', authRateLimit, validate(registerSchema), controller.register);
+router.post('/email/login', authRateLimit, validate(loginSchema), controller.login);
 router.post('/google', authRateLimit, validate(googleLoginSchema), controller.googleLogin);
 router.post('/refresh', validate(refreshTokenSchema), controller.refresh);
 router.post('/logout', controller.logout);

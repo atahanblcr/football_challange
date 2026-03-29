@@ -49,7 +49,7 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
       return AuthState(
         isAuthenticated: true,
         isBanned: user.isBanned,
-        needsNickname: user.nickname.isEmpty,
+        needsNickname: user.nickname.isEmpty || user.nickname.startsWith('user_'),
         needsAvatar: user.avatarIndex == null,
         userId: user.id,
       );
@@ -73,7 +73,7 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
       return AuthState(
         isAuthenticated: true,
         isBanned: user.isBanned,
-        needsNickname: user.nickname.isEmpty,
+        needsNickname: user.nickname.isEmpty || user.nickname.startsWith('user_'),
         needsAvatar: user.avatarIndex == null,
         userId: user.id,
       );
@@ -110,7 +110,7 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
       return AuthState(
         isAuthenticated: true,
         isBanned: user.isBanned,
-        needsNickname: user.nickname.isEmpty,
+        needsNickname: user.nickname.isEmpty || user.nickname.startsWith('user_'),
         needsAvatar: user.avatarIndex == null,
         userId: user.id,
       );
@@ -120,6 +120,8 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
   Future<void> logout() async {
     try {
       await ref.read(authRepositoryProvider).logout();
+    } catch (_) {
+      // Oturum zaten sunucuda kapalı olabilir, sessizce devam et
     } finally {
       await ref.read(secureStorageProvider).clearAll();
       state = const AsyncValue.data(AuthState());
@@ -151,3 +153,8 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
 final authStateProvider = AsyncNotifierProvider<AuthNotifier, AuthState>(
   AuthNotifier.new,
 );
+
+// Onboarding geçici state provider'ları
+final signupNicknameProvider = StateProvider<String>((ref) => '');
+final signupAvatarProvider = StateProvider<int>((ref) => 0);
+final signupCountryProvider = StateProvider<String>((ref) => 'XX');

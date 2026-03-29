@@ -6,6 +6,7 @@ class GameSession {
   final String difficulty;
   final int answerCount;
   final int timeLimit;
+  int get timeLimitSeconds => timeLimit;
   final DateTime startedAt;
 
   const GameSession({

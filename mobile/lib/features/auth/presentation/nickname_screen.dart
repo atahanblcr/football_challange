@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../../core/router/route_names.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../shared/widgets/primary_button_widget.dart';
@@ -75,7 +77,7 @@ class _NicknameScreenState extends ConsumerState<NicknameScreen> {
               isLoading: _isLoading,
               onPressed: _isAvailable ? () {
                 ref.read(signupNicknameProvider.notifier).state = _controller.text.trim();
-                context.push(RouteNames.avatarCountry);
+                context.pushNamed('avatarCountry');
               } : null,
             ),
           ],

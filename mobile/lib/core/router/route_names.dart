@@ -3,6 +3,7 @@ class RouteNames {
   static const String forceUpdate    = '/force-update';
   static const String onboarding     = '/onboarding';
   static const String login          = '/login';
+  static const String register       = '/register';
   static const String nickname       = '/nickname';
   static const String avatarCountry  = '/avatar-country';
   static const String banned         = '/banned';

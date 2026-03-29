@@ -8,6 +8,6 @@ const router = Router();
  * Uygulama açılışında çağrılan konfigürasyon endpoint'i.
  * Auth gerektirmez.
  */
-router.get('/', appConfigController.getConfig);
+router.get('/config', appConfigController.getConfig);
 
 export { router as appConfigRouter };

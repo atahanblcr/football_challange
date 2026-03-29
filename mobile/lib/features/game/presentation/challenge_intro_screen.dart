@@ -75,7 +75,7 @@ class _ChallengeIntroScreenState extends ConsumerState<ChallengeIntroScreen> {
           children: [
             const Spacer(),
             _buildModuleIcon(widget.module)
-                .animate().scale(duration: 600.ms, curve: Curves.backOut),
+                .animate().scale(duration: 600.ms, curve: Curves.easeOutBack),
             const SizedBox(height: 32),
             const Text(
               'Challenge Başlıyor!',

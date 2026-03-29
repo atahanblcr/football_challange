@@ -6,7 +6,6 @@ import '../../../core/constants/app_text_styles.dart';
 import '../../../core/router/route_names.dart';
 import '../../../shared/widgets/primary_button_widget.dart';
 import '../../../shared/providers/auth_provider.dart';
-import 'signup_provider.dart';
 
 class AvatarCountryScreen extends ConsumerStatefulWidget {
   const AvatarCountryScreen({super.key});

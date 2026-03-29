@@ -8,7 +8,8 @@ export const registerSchema = z.object({
     nickname: z.string()
       .min(3, 'Nickname en az 3 karakter olmalıdır')
       .max(20, 'Nickname en fazla 20 karakter olmalıdır')
-      .regex(/^[a-zA-Z0-9_]+$/, 'Nickname sadece harf, rakam ve alt çizgi içerebilir'),
+      .regex(/^[a-zA-Z0-9_]+$/, 'Nickname sadece harf, rakam ve alt çizgi içerebilir')
+      .optional(),
     referredByCode: z.string().optional(),
   })
 });

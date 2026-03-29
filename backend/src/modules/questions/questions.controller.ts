@@ -8,7 +8,10 @@ export class QuestionController {
   public async getDailyQuestions(req: Request, res: Response, next: NextFunction) {
     try {
       const questions = await QuestionService.getDailyQuestions();
-      res.json(questions);
+      res.json({
+        status: 'success',
+        data: questions
+      });
     } catch (error) {
       next(error);
     }
@@ -21,7 +24,10 @@ export class QuestionController {
     try {
       const { id } = req.params;
       const meta = await QuestionService.getQuestionMeta(id);
-      res.json(meta);
+      res.json({
+        status: 'success',
+        data: meta
+      });
     } catch (error) {
       next(error);
     }

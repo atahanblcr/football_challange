@@ -1,12 +1,14 @@
 class SearchResult {
   final String entityId;
   final String name;
+  final String? clubName;
   final String? countryCode;
   final String? imagePath;
 
   const SearchResult({
     required this.entityId,
     required this.name,
+    this.clubName,
     this.countryCode,
     this.imagePath,
   });
@@ -15,6 +17,7 @@ class SearchResult {
     return SearchResult(
       entityId: json['id'] as String,
       name: json['name'] as String,
+      clubName: json['clubName'] as String?,
       countryCode: json['countryCode'] as String?,
       imagePath: json['imagePath'] as String?,
     );

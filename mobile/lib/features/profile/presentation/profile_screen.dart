@@ -55,7 +55,7 @@ class ProfileScreen extends ConsumerWidget {
                         border: Border.all(color: AppColors.primary, width: 2),
                       ),
                       child: const Center(child: Text('👤', style: TextStyle(fontSize: 48))),
-                    ).animate().scale(duration: 600.ms, curve: Curves.backOut),
+                    ).animate().scale(duration: 600.ms, curve: Curves.easeOutBack),
                     const SizedBox(height: 16),
                     Text(userAsync.value?.nickname ?? '...', style: AppTextStyles.titleMedium),
                     const SizedBox(height: 4),
@@ -123,7 +123,15 @@ class ProfileScreen extends ConsumerWidget {
                         color: AppColors.surface,
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      child: const Center(child: Text('🏅', style: TextStyle(fontSize: 32, opacity: 0.3))),
+                      child: Center(
+                        child: Text(
+                          '🏅', 
+                          style: TextStyle(
+                            fontSize: 32, 
+                            color: Colors.white.withValues(alpha: 0.3)
+                          )
+                        )
+                      ),
                     );
                   },
                 ),

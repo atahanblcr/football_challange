@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../result_provider.dart';
-import '../data/result_repository.dart';
+import '../../data/result_repository.dart';
 
 class AdRewardButtonWidget extends ConsumerStatefulWidget {
   final String sessionId;
