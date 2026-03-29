@@ -1,8 +1,8 @@
 // src/components/dashboard/ActiveQuestionsTable.tsx
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/config/api';
-import { MODULE_LABELS, DIFFICULTY_CONFIG } from '@/lib/utils';
-import { HelpCircle, ExternalLink } from 'lucide-react';
+import { MODULE_LABELS } from '@/lib/utils';
+import { ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export function ActiveQuestionsTable() {
@@ -40,11 +40,11 @@ export function ActiveQuestionsTable() {
             <tr key={assignment.id} className="hover:bg-surface-variant/30 transition-colors">
               <td className="px-4 py-3">
                 <span className="text-xs bg-surface-variant px-2 py-1 rounded">
-                  {MODULE_LABELS[assignment.question.module] || assignment.question.module}
+                  {MODULE_LABELS[assignment.question?.module] || assignment.question?.module || 'Bilinmiyor'}
                 </span>
               </td>
               <td className="px-4 py-3 font-medium text-slate-200">
-                {assignment.question.title}
+                {assignment.question?.title || 'Başlıksız Soru'}
               </td>
               <td className="px-4 py-3">
                 <span className="text-xs text-green-400 flex items-center gap-1">
@@ -53,12 +53,14 @@ export function ActiveQuestionsTable() {
                 </span>
               </td>
               <td className="px-4 py-3">
-                <Link 
-                  to={`/questions/${assignment.question.id}/edit`}
-                  className="text-slate-500 hover:text-white transition-colors"
-                >
-                  <ExternalLink size={16} />
-                </Link>
+                {assignment.question?.id && (
+                  <Link 
+                    to={`/questions/${assignment.question.id}/edit`}
+                    className="text-slate-500 hover:text-white transition-colors"
+                  >
+                    <ExternalLink size={16} />
+                  </Link>
+                )}
               </td>
             </tr>
           ))}

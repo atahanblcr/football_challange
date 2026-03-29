@@ -13,38 +13,47 @@ export class SearchService {
     if (!query || query.length < 2) return [];
 
     const normalizedQuery = normalizeText(query);
-    const cacheKey = redisKeys.autocomplete(type, normalizedQuery);
+    // GEMINI.md 12.2: İlk 3 harfe göre cache'le
+    const prefix = normalizedQuery.slice(0, 3);
+    const cacheKey = redisKeys.autocomplete(type, prefix);
+
+    let results: any[] = [];
 
     // 1. Redis Cache Kontrolü
     const cachedResults = await redis.get(cacheKey);
     if (cachedResults) {
-      return JSON.parse(cachedResults);
+      results = JSON.parse(cachedResults);
+    } else {
+      // 2. Cache MISS ise DB'den PREFIX ile çek
+      // prefix tabanlı cache için prefix ile arayıp hepsini cache'liyoruz.
+      // Hem name hem alias içinde prefix araması yapıyoruz.
+      results = await prisma.$queryRawUnsafe(`
+        SELECT id, name, "nameTr", "countryCode", "imagePath", type, alias
+        FROM "Entity"
+        WHERE type::text = $1
+          AND "isActive" = true
+          AND (
+            to_tsvector('simple', normalize_turkish(name || ' ' || array_to_string(alias, ' ')))
+            @@ to_tsquery('simple', normalize_turkish($2) || ':*')
+            OR normalize_turkish(name) ILIKE normalize_turkish($3)
+            OR array_to_string(alias, ' ') ILIKE normalize_turkish($3)
+          )
+        ORDER BY name ASC
+        LIMIT 100
+      `, type, prefix, `%${prefix}%`);
+
+      if (Array.isArray(results) && results.length > 0) {
+        await redis.set(cacheKey, JSON.stringify(results), 'EX', 300);
+      }
     }
 
-    // 2. PostgreSQL FTS Sorgusu (Raw Query)
-    // to_tsvector('simple', ...) kullanarak normalizasyon fonksiyonumuzla uyumlu arama yapıyoruz.
-    const results = await prisma.$queryRawUnsafe(`
-      SELECT id, name, "nameTr", "countryCode", "imagePath", type
-      FROM "Entity"
-      WHERE type::text = $1
-        AND "isActive" = true
-        AND (
-          to_tsvector('simple', normalize_turkish(name || ' ' || array_to_string(alias, ' ')))
-          @@ plainto_tsquery('simple', normalize_turkish($2))
-          OR normalize_turkish(name) LIKE normalize_turkish($3)
-        )
-      ORDER BY ts_rank(
-        to_tsvector('simple', normalize_turkish(name || ' ' || array_to_string(alias, ' '))),
-        plainto_tsquery('simple', normalize_turkish($2))
-      ) DESC
-      LIMIT 6
-    `, type, query, `%${query}%`);
+    // 3. Bellekteki sonuçları asıl query'ye göre filtrele
+    const filteredResults = results.filter(e => {
+      const normalizedName = normalizeText(e.name);
+      const normalizedAliases = (e.alias || []).map((a: string) => normalizeText(a));
+      return normalizedName.includes(normalizedQuery) || normalizedAliases.some((a: string) => a.includes(normalizedQuery));
+    }).slice(0, 6);
 
-    // 3. Sonuçları Redis'e Yaz (TTL: 5 Dakika)
-    if (Array.isArray(results) && results.length > 0) {
-      await redis.set(cacheKey, JSON.stringify(results), 'EX', 300);
-    }
-
-    return results;
+    return filteredResults;
   }
 }

@@ -6,6 +6,7 @@ import { AlertTriangle, Users, CheckCircle, TrendingUp, Calendar } from 'lucide-
 import { PoolHealthWidget } from '@/components/dashboard/PoolHealthWidget';
 import { ActiveQuestionsTable } from '@/components/dashboard/ActiveQuestionsTable';
 import { StatCard } from '@/components/dashboard/StatCard';
+import { Link } from 'react-router-dom';
 
 export function Dashboard() {
   const { data, isLoading } = useQuery({
@@ -75,9 +76,9 @@ export function Dashboard() {
             </span>
             <p className="text-xs text-yellow-500/80">Lütfen hile tespiti sistemindeki verileri inceleyin ve gerekirse kullanıcıları banlayın.</p>
           </div>
-          <a href="/users?filter=suspicious" className="ml-auto bg-yellow-500 text-background text-xs font-bold px-4 py-2 rounded-lg hover:bg-yellow-400 transition-colors">
+          <Link to="/users?filter=suspicious" className="ml-auto bg-yellow-500 text-background text-xs font-bold px-4 py-2 rounded-lg hover:bg-yellow-400 transition-colors">
             Hemen İncele
-          </a>
+          </Link>
         </div>
       )}
 

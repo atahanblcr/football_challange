@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useUsers, useBanUser, useUnbanUser } from '@/hooks/use-users';
 import { Search, ShieldAlert, ShieldCheck, User, MapPin, Calendar, Loader2, X } from 'lucide-react';
-import { formatDate } from '@/lib/utils';
+import { formatDate, formatNumber } from '@/lib/utils';
+import { useQuery } from '@tanstack/react-query';
+import { api } from '@/config/api';
 
 export function UserList() {
   const [filters, setFilters] = useState({
@@ -10,6 +12,7 @@ export function UserList() {
     search: '',
     isBanned: '',
   });
+  const [selectedUser, setSelectedUser] = useState<any>(null);
 
   const { data, isLoading } = useUsers(filters);
   const banMutation = useBanUser();
@@ -76,7 +79,7 @@ export function UserList() {
             </thead>
             <tbody className="divide-y divide-surface-variant">
               {(data?.items ?? []).map((user: any) => (
-                <tr key={user.id} className="hover:bg-surface-variant/30 transition-colors group">
+                <tr key={user.id} className="hover:bg-surface-variant/30 transition-colors group cursor-pointer" onClick={() => setSelectedUser(user)}>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center text-slate-400">

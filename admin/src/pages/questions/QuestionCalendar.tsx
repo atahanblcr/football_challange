@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/config/api';
-import { MODULE_LABELS, formatDate } from '@/lib/utils';
+import { MODULE_LABELS } from '@/lib/utils';
 import { 
-  ChevronLeft, ChevronRight, HelpCircle, 
-  Calendar as CalendarIcon, Loader2, AlertCircle 
+  ChevronLeft, ChevronRight, Loader2 
 } from 'lucide-react';
 import { 
   format, addMonths, subMonths, startOfMonth, 
@@ -107,7 +106,7 @@ export function QuestionCalendar() {
                   <Loader2 size={32} className="animate-spin text-primary" />
                 </div>
               ) : (
-                days.map((day, idx) => {
+                days.map((day) => {
                   const dayStr = format(day, 'yyyy-MM-dd');
                   const dayAssignments = (assignments ?? []).filter((a: any) => 
                     format(new Date(a.date), 'yyyy-MM-dd') === dayStr

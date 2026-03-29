@@ -1,8 +1,8 @@
 // src/pages/questions/QuestionList.tsx
 import { useState } from 'react';
 import { useQuestions, useArchiveQuestion } from '@/hooks/use-questions';
-import { MODULE_LABELS, DIFFICULTY_CONFIG, STATUS_CONFIG, formatDate } from '@/lib/utils';
-import { Plus, Search, Edit2, Trash2, Calendar, Filter, Loader2 } from 'lucide-react';
+import { MODULE_LABELS, DIFFICULTY_CONFIG, STATUS_CONFIG } from '@/lib/utils';
+import { Plus, Search, Edit2, Trash2, Calendar, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export function QuestionList() {

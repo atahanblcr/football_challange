@@ -50,7 +50,7 @@ describe('RateLimitMiddleware', () => {
 
     const error = nextFunction.mock.calls[0][0];
     expect(error).toBeInstanceOf(ApiError);
-    expect(error.statusCode).toBe(400);
+    expect(error.statusCode).toBe(429);
     expect(error.code).toBe('RATE_LIMIT_EXCEEDED');
   });
 });

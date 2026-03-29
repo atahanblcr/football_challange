@@ -2,8 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '@/config/api';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, 
-  Tooltip, ResponsiveContainer, BarChart, Bar, Cell,
-  PieChart, Pie
+  Tooltip, ResponsiveContainer, BarChart, Bar, Cell
 } from 'recharts';
 import { Loader2, TrendingUp, Users, CheckCircle, Award } from 'lucide-react';
 import { formatNumber } from '@/lib/utils';

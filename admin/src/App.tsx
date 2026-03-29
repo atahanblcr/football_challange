@@ -14,15 +14,13 @@ import { Login } from '@/pages/Login';
 import { Dashboard } from '@/pages/Dashboard';
 import { QuestionList } from '@/pages/questions/QuestionList';
 import { QuestionCreate } from '@/pages/questions/QuestionCreate';
+import { QuestionEdit } from '@/pages/questions/QuestionEdit';
+import { QuestionCalendar } from '@/pages/questions/QuestionCalendar';
 import { EntityList } from '@/pages/entities/EntityList';
 import { UserList } from '@/pages/users/UserList';
 import { EventList } from '@/pages/events/EventList';
-
-// Placeholder Pages (Temporary)
-const QuestionEdit = () => <div className="p-6"><h1>Soru Düzenle</h1><p>Geliştirme aşamasında...</p></div>;
-const QuestionCalendar = () => <div className="p-6"><h1>Soru Takvimi</h1><p>Geliştirme aşamasında...</p></div>;
-const StatsPage = () => <div className="p-6"><h1>İstatistikler</h1><p>Geliştirme aşamasında...</p></div>;
-const SettingsPage = () => <div className="p-6"><h1>Ayarlar</h1><p>Geliştirme aşamasında...</p></div>;
+import { StatsPage } from '@/pages/stats/StatsPage';
+import { SettingsPage } from '@/pages/settings/SettingsPage';
 
 export default function App() {
   const { checkSession } = useAuth();
@@ -93,6 +91,7 @@ export default function App() {
         }}
       />
 
+      {/* @ts-ignore */}
       {import.meta.env.DEV && <ReactQueryDevtools />}
     </QueryClientProvider>
   );

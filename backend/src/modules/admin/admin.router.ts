@@ -7,6 +7,7 @@ import { adminEventsRouter } from './events/admin-events.router';
 import { adminQuestionsRouter } from './questions/admin-questions.router';
 import { adminStatsRouter } from './stats/admin-stats.router';
 import { adminUsersRouter } from './users/admin-users.router';
+import { adminAppConfigRouter } from './app-config/admin-app-config.router';
 import { adminAdminsController } from './admins/admin-admins.controller';
 import { rateLimitMiddleware } from '../../middleware/rate-limit.middleware';
 
@@ -29,5 +30,6 @@ router.use('/events', adminEventsRouter);
 router.use('/questions', adminQuestionsRouter);
 router.use('/stats', adminStatsRouter);
 router.use('/users', adminUsersRouter);
+router.use('/app-config', adminAppConfigRouter);
 
 export { router as adminRouter };

@@ -7,6 +7,7 @@ import { EntitySearch } from '@/components/questions/EntitySearch';
 import { MODULE_LABELS, DIFFICULTY_CONFIG } from '@/lib/utils';
 import { ArrowLeft, Save, Rocket, AlertCircle, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 export function QuestionCreate() {
   const navigate = useNavigate();
@@ -28,8 +29,8 @@ export function QuestionCreate() {
   const [answers, setAnswers] = useState<AnswerItem[]>([]);
 
   const handleSubmit = async (status: string) => {
-    if (!form.title) return alert('Lütfen bir başlık girin.');
-    if (answers.length < 1) return alert('En az bir cevap eklemelisiniz.');
+    if (!form.title) return toast.error('Lütfen bir başlık girin.');
+    if (answers.length < 1) return toast.error('En az bir cevap eklemelisiniz.');
 
     const payload = {
       ...form,
@@ -50,7 +51,7 @@ export function QuestionCreate() {
 
   const handleAddAnswer = (item: AnswerItem) => {
     if (answers.some(a => a.entityId === item.entityId)) {
-      return alert('Bu entity zaten eklenmiş.');
+      return toast.error('Bu entity zaten eklenmiş.');
     }
     setAnswers([...answers, item]);
   };

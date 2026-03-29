@@ -62,7 +62,7 @@ describe('useAuth hook', () => {
     expect(window.location.href).toBe('/login');
 
     // Restore location
-    window.location = originalLocation;
+    window.location = originalLocation as any;
   });
 
   it('should set admin on successful checkSession', async () => {

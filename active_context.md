@@ -1,27 +1,21 @@
 # AKTİF ÇALIŞMA BAĞLAMI (ACTIVE CONTEXT)
 
-**Şu Anki Faz:** Faz 1 & 2 (İyileştirme ve Düzeltme)
-**Şu Anki Görev:** Gemini Raporu Sonrası Kritik Düzeltmeler ve Test Stabilizasyonu
+**Şu Anki Faz:** Faz 3 (Mobil Hazırlık)
+**Şu Anki Görev:** Backend Stabilizasyonu Tamamlandı, Flutter Başlangıcı
 
 ## Mevcut Odak Noktası
-- Gemini raporunda belirtilen kritik veritabanı şeması ve iş mantığı hataları giderildi.
-- Kodlar güncellendi ve GitHub'a pushlandı.
-- **Kritik Durum:** Bazı testler (özellikle Redis mock ve Prisma bağlantı limitleri nedeniyle) şu an geçmiyor.
+- Tüm backend testleri (89 adet) başarıyla tamamlandı.
+- Redis ve Prisma bağlantı sorunları giderildi.
+- Arama ve cache çakışması (Prefix-based) sorunları çözüldü.
+- **Kritik Durum:** Backend ve Admin Paneli Faz 3'e geçmek için %100 hazır.
 
 ## Son Yapılan İşlemler
-- **DB Şema Fix:** `DailyQuestionAssignment` unique constraint `[date, module, isExtra]` olarak güncellendi.
-- **Scoring Fix:** `scoreBase` zorluk çarpanı öncesi `Math.floor` ile yuvarlanarak DB tutarlılığı sağlandı.
-- **Hile Tespiti Fix:** 4 saniye kuralı `submittedAnswers.length` bazlı hale getirildi.
-- **Kod Güncelleme:** `DailyQuestionAssignment`, `User`, `SpecialEvent` ve `AppConfig` modellerine eksik alanlar eklendi.
-- **Git:** Değişiklikler repoya pushlandı.
-
-## Geçmeyen / Eksik Testler (ACİL)
-1.  **Rate Limit Testleri:** `redis.incr.mockResolvedValue` TypeError hatası veriyor. Redis mock yapısı testlerde tam oturtulmalı.
-2.  **RBAC Middleware:** `adminUser` yerine `admin` property'si kullanıldığı için unit testleri fail ediyor.
-3.  **Search Module:** Türkçe karakter "case-insensitive" (Büyük/Küçük harf) uyuşmazlığı nedeniyle Mesut Özil araması başarısız oluyor.
-4.  **Prisma Connection Limit:** `MaxClientsInSessionMode` hatası nedeniyle `auth` ve `leaderboard` entegrasyon testleri toplu çalışınca patlıyor.
+- **Redis Mock Fix:** Leaderboard testleri için eksik Redis metodları mock'landı.
+- **Prisma Fix:** Test izolasyonu için `afterAll` disconnect eklendi.
+- **Search Fix:** `SearchService` prefix-based cache logic (GEMINI.md 12.2) uygulandı ve in-memory filter eklendi.
+- **Testler:** Tüm testler yeşil (Green).
 
 ## Sıradaki Adımlar
-1. Yukarıdaki geçmeyen testlerin tek tek ele alınıp düzeltilmesi.
-2. Prisma bağlantı havuzunun (pooling) test ortamı için optimize edilmesi.
-3. Tüm testler yeşil yandıktan sonra Faz 3 (Mobil) kurulumuna geçilmesi.
+1. Faz 3 (Mobil) klasör yapısının kontrolü ve Riverpod/GoRouter kurulumlarının doğrulanması.
+2. Flutter API client (Dio) altyapısının kurulması.
+3. Giriş ve Onboarding ekranlarının kodlanması.

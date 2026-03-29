@@ -4,7 +4,7 @@ import { useQuestion, useUpdateQuestion } from '@/hooks/use-questions';
 import { AnswerDragList, AnswerItem } from '@/components/questions/AnswerDragList';
 import { EntitySearch } from '@/components/questions/EntitySearch';
 import { MODULE_LABELS, DIFFICULTY_CONFIG } from '@/lib/utils';
-import { ArrowLeft, Save, Rocket, AlertCircle, Loader2 } from 'lucide-react';
+import { ArrowLeft, Save, AlertCircle, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export function QuestionEdit() {
