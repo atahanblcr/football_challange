@@ -1,21 +1,20 @@
 # AKTİF ÇALIŞMA BAĞLAMI (ACTIVE CONTEXT)
 
-**Şu Anki Faz:** Faz 4'e Geçiş (İçerik ve Lansman Hazırlığı)
-**Şu Anki Görev:** Mobil Uygulama Geliştirme (Phase 3) Tamamlandı, API Entegrasyonu Doğrulandı
+**Şu Anki Faz:** Faz 4: İçerik ve Lansman Hazırlığı (BAŞLATILDI)
+**Şu Anki Görev:** Gerçek Veri Girişi ve 3rd Party Entegrasyonları
 
 ## Mevcut Odak Noktası
-- **Mobil Entegrasyon:** Uygulamanın tüm feature'ları (Auth, Home, Game, Result, Leaderboard, Profile) backend API'leri ile uçtan uca bağlandı.
-- **Kullanıcı Deneyimi:** `AppConfig` üzerinden force update kontrolü, nickname müsaitlik kontrolü ve dinamik oyun slotları gibi kritik akışlar tamamlandı.
-- **Görsellik:** `flutter_animate` ile ekran geçişleri, puan sayma animasyonları ve "Frosted Glass" blur efektleri dökümantasyona sadık kalınarak cilalandı.
+- **Backend Stabilizasyonu:** Auth rotaları, Question meta formatı ve Job cooldown mantığındaki regresyonlar giderildi. 93 testin tamamı (%100) başarılı.
+- **Mobil Entegrasyon:** Phase 3 uçtan uca tamamlandı, repo güncellendi ve pushlandı.
+- **İçerik Stratejisi:** Admin paneli üzerinden her modül için 30+ gerçek sorunun girilmesi aşamasına geçildi.
 
 ## Son Yapılan İşlemler
-- **Auth Flow:** Email login/register ve profil tamamlama (Avatar/Country) akışları repository ve provider seviyesinde bağlandı.
-- **Game Cycle:** `ChallengeIntro` ekranından `Result` ekranına kadar olan tüm oyun döngüsü gerçek API parametreleriyle (Difficulty, TimeLimit vb.) senkronize edildi.
-- **Testing:** Mobil uygulama için 9 adet unit ve widget testi yazılarak %100 başarılı sonuçlar elde edildi.
-- **Consistency:** Dinamik puanlama çarpanlarının veritabanından çekilip mobil tarafa yansıtılması uçtan uca doğrulandı.
+- **Regression Fix:** Auth URL'leri (`/email/register`), Question wrapper formatı ve Job izolasyon testleri düzeltildi.
+- **Sync:** Mobil uygulama API endpoint'leri ile backend router yapısı senkronize edildi.
+- **Final Push:** Faz 3'ün tüm düzeltmeleri ve stabilizasyon çalışmaları repoya başarıyla gönderildi.
 
 ## Sıradaki Adımlar
-1. Admin paneli üzerinden 120+ gerçek futbol sorusunun sisteme girilmesi.
-2. Firebase Push Notifications ve AdMob canlı servislerinin entegrasyonu.
-3. Gerçek cihazlarda (iOS & Android) son UI/UX cilalamalarının yapılması.
+1. Her modül (Players, Clubs, Nationals, Managers) için 30'ar adet (toplam 120+) gerçek futbol sorusunun admin panelinden girilmesi.
+2. Firebase Cloud Messaging (Push Notifications) kurulumu ve backend bildirimi tetikleyicileri.
+3. AdMob canlı reklam birimlerinin mobil uygulamaya eklenmesi ve test edilmesi.
 

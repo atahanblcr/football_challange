@@ -61,5 +61,18 @@
 - [x] Repository Unit Testleri: API entegrasyonu ve hata yönetimi mock Dio ile test edildi.
 - [x] Widget Testleri: `PrimaryButton` ve `TimerWidget` gibi kritik bileşenlerin işlevselliği kanıtlandı.
 
+## [2026-03-30] — FAZ 3: FİNAL STABİLİZASYON (TAMAMLANDI)
+- [x] Backend Auth rotaları dökümantasyona göre düzeltildi (`/email/register` & `/email/login`).
+- [x] Question Controller yanıt formatı sarmalayıcı (wrapper) yapısına göre testler güncellendi.
+- [x] Job Cooldown mantığı için 100% izolasyon sağlayan yeni unit test yazıldı.
+- [x] Tüm backend testleri (93/93) başarıyla geçti.
+- [x] Yapılan tüm değişiklikler repoya (remote) gönderildi.
+
+## FAZ 4 — İÇERİK VE LANSMAN HAZIRLIĞI (BAŞLATILDI)
+- [ ] Modül başına 30+ gerçek futbol sorusunun girilmesi.
+- [ ] Firebase Cloud Messaging (Push Notifications) entegrasyonu.
+- [ ] AdMob canlı reklam ID'lerinin eklenmesi.
+- [ ] iOS & Android Store hazırlıkları (Screenshot, Privacy Policy).
+
 ### Sıradaki Adım
-- [ ] Faz 4: Gerçek içerik girişi (120+ soru) ve Firebase/Push Notification entegrasyonu.
+- [ ] Faz 4: Gerçek içerik girişi (120+ soru) ve Firebase servis kurulumu.
