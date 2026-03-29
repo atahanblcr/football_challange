@@ -68,20 +68,45 @@ export const adminUsersService = {
       where: { id },
       include: {
         gameSessions: {
-          where: { flagSuspicious: true },
           select: {
             id: true,
             submittedAt: true,
-            suspiciousReason: true
+            suspiciousReason: true,
+            flagSuspicious: true,
+            scoreFinal: true,
+            adMultiplied: true
           },
-          orderBy: { submittedAt: 'desc' },
-          take: 10
+          orderBy: { createdAt: 'desc' },
+          take: 20
+        },
+        _count: {
+          select: {
+            gameSessions: true,
+            pointHistory: true
+          }
         }
       }
     });
 
     if (!user) throw ApiError.notFound('Kullanıcı bulunamadı');
-    return user;
+
+    // Agrega verileri hesapla
+    const totalScore = await prisma.pointHistory.aggregate({
+      where: { userId: id },
+      _sum: { points: true }
+    });
+
+    const adsWatched = await prisma.gameSession.count({
+      where: { userId: id, adMultiplied: true }
+    });
+
+    return {
+      ...user,
+      totalScore: totalScore._sum.points || 0,
+      adsWatched,
+      sessionsCount: user._count.gameSessions,
+      suspiciousSessions: user.gameSessions.filter(s => s.flagSuspicious)
+    };
   },
 
   getFlagged: async () => {

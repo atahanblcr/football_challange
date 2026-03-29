@@ -1,21 +1,21 @@
 # AKTİF ÇALIŞMA BAĞLAMI (ACTIVE CONTEXT)
 
-**Şu Anki Faz:** Faz 3 (Mobil Hazırlık)
-**Şu Anki Görev:** Backend Stabilizasyonu Tamamlandı, Flutter Başlangıcı
+**Şu Anki Faz:** Faz 4'e Geçiş (İçerik ve Lansman Hazırlığı)
+**Şu Anki Görev:** Mobil Uygulama Geliştirme (Phase 3) Tamamlandı, API Entegrasyonu Doğrulandı
 
 ## Mevcut Odak Noktası
-- Tüm backend testleri (89 adet) başarıyla tamamlandı.
-- Redis ve Prisma bağlantı sorunları giderildi.
-- Arama ve cache çakışması (Prefix-based) sorunları çözüldü.
-- **Kritik Durum:** Backend ve Admin Paneli Faz 3'e geçmek için %100 hazır.
+- **Mobil Entegrasyon:** Uygulamanın tüm feature'ları (Auth, Home, Game, Result, Leaderboard, Profile) backend API'leri ile uçtan uca bağlandı.
+- **Kullanıcı Deneyimi:** `AppConfig` üzerinden force update kontrolü, nickname müsaitlik kontrolü ve dinamik oyun slotları gibi kritik akışlar tamamlandı.
+- **Görsellik:** `flutter_animate` ile ekran geçişleri, puan sayma animasyonları ve "Frosted Glass" blur efektleri dökümantasyona sadık kalınarak cilalandı.
 
 ## Son Yapılan İşlemler
-- **Redis Mock Fix:** Leaderboard testleri için eksik Redis metodları mock'landı.
-- **Prisma Fix:** Test izolasyonu için `afterAll` disconnect eklendi.
-- **Search Fix:** `SearchService` prefix-based cache logic (GEMINI.md 12.2) uygulandı ve in-memory filter eklendi.
-- **Testler:** Tüm testler yeşil (Green).
+- **Auth Flow:** Email login/register ve profil tamamlama (Avatar/Country) akışları repository ve provider seviyesinde bağlandı.
+- **Game Cycle:** `ChallengeIntro` ekranından `Result` ekranına kadar olan tüm oyun döngüsü gerçek API parametreleriyle (Difficulty, TimeLimit vb.) senkronize edildi.
+- **Testing:** Mobil uygulama için 9 adet unit ve widget testi yazılarak %100 başarılı sonuçlar elde edildi.
+- **Consistency:** Dinamik puanlama çarpanlarının veritabanından çekilip mobil tarafa yansıtılması uçtan uca doğrulandı.
 
 ## Sıradaki Adımlar
-1. Faz 3 (Mobil) klasör yapısının kontrolü ve Riverpod/GoRouter kurulumlarının doğrulanması.
-2. Flutter API client (Dio) altyapısının kurulması.
-3. Giriş ve Onboarding ekranlarının kodlanması.
+1. Admin paneli üzerinden 120+ gerçek futbol sorusunun sisteme girilmesi.
+2. Firebase Push Notifications ve AdMob canlı servislerinin entegrasyonu.
+3. Gerçek cihazlarda (iOS & Android) son UI/UX cilalamalarının yapılması.
+

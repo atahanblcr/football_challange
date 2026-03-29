@@ -21,18 +21,9 @@ export function StatsPage() {
     );
   }
 
-  const { today, poolHealth } = data;
-
-  // Mock data for charts (Backend should provide historical data in a real scenario)
-  const activityData = [
-    { name: 'Pzt', users: 400, sessions: 240 },
-    { name: 'Sal', users: 300, sessions: 139 },
-    { name: 'Çar', users: 200, sessions: 980 },
-    { name: 'Per', users: 278, sessions: 390 },
-    { name: 'Cum', users: 189, sessions: 480 },
-    { name: 'Cmt', users: 239, sessions: 380 },
-    { name: 'Paz', users: 349, sessions: 430 },
-  ];
+  const stats = data?.today ?? {};
+  const pool = data?.poolHealth ?? [];
+  const activityData = data?.activityData ?? [];
 
   return (
     <div className="p-6 space-y-6">
@@ -46,30 +37,32 @@ export function StatsPage() {
         <div className="bg-surface p-5 rounded-2xl border border-surface-variant shadow-lg">
           <div className="flex items-center gap-3 text-slate-400 text-xs mb-3 font-bold uppercase">
             <Users size={16} className="text-primary" />
-            Aktif Kullanıcı (7G)
+            DAU / MAU
           </div>
-          <p className="text-3xl font-bold text-white">{formatNumber(today.activeUsers || 0)}</p>
+          <p className="text-3xl font-bold text-white">{formatNumber(stats.dau || 0)} / {formatNumber(stats.mau || 0)}</p>
+          <div className="text-[10px] text-slate-500 mt-2">Churn Rate: <span className="text-wrong font-bold">%{stats.churnRate}</span></div>
         </div>
         <div className="bg-surface p-5 rounded-2xl border border-surface-variant shadow-lg">
           <div className="flex items-center gap-3 text-slate-400 text-xs mb-3 font-bold uppercase">
             <CheckCircle size={16} className="text-correct" />
             Bugün Çözülen
           </div>
-          <p className="text-3xl font-bold text-white">{formatNumber(today.sessions || 0)}</p>
+          <p className="text-3xl font-bold text-white">{formatNumber(stats.sessions || 0)}</p>
+          <div className="text-[10px] text-slate-500 mt-2">Reklam Artışı: <span className="text-correct font-bold">{stats.adUsageCount}</span> kez</div>
         </div>
         <div className="bg-surface p-5 rounded-2xl border border-surface-variant shadow-lg">
           <div className="flex items-center gap-3 text-slate-400 text-xs mb-3 font-bold uppercase">
             <TrendingUp size={16} className="text-warning" />
-            Tamamlama Oranı
+            Tamamlama / Abandon
           </div>
-          <p className="text-3xl font-bold text-white">%{today.completionRate || 0}</p>
+          <p className="text-3xl font-bold text-white">%{stats.completionRate || 0} / %{stats.abandonRate || 0}</p>
         </div>
         <div className="bg-surface p-5 rounded-2xl border border-surface-variant shadow-lg">
           <div className="flex items-center gap-3 text-slate-400 text-xs mb-3 font-bold uppercase">
             <Award size={16} className="text-purple-400" />
             Ort. Puan/Soru
           </div>
-          <p className="text-3xl font-bold text-white">{(today.avgScore || 0).toFixed(1)}</p>
+          <p className="text-3xl font-bold text-white">{(stats.avgScore || 0).toFixed(1)}</p>
         </div>
       </div>
 

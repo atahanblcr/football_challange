@@ -54,13 +54,16 @@ export class SessionService {
    * Submits answers for a session and calculates points.
    */
   public async submitSession(userId: string, sessionId: string, submittedAnswers: string[]) {
-    const session = await prisma.gameSession.findUnique({
-      where: { id: sessionId },
-      include: { 
-        question: { include: { answers: true } },
-        user: { select: { countryCode: true } }
-      },
-    });
+    const [session, config] = await Promise.all([
+      prisma.gameSession.findUnique({
+        where: { id: sessionId },
+        include: { 
+          question: { include: { answers: true } },
+          user: { select: { countryCode: true } }
+        },
+      }),
+      prisma.appConfig.findFirst()
+    ]);
 
     if (!session) throw new ApiError(404, ErrorCode.NOT_FOUND, 'Oturum bulunamadı.');
     if (session.userId !== userId) throw new ApiError(403, ErrorCode.FORBIDDEN, 'Bu oturum size ait değil.');
@@ -96,14 +99,20 @@ export class SessionService {
       remainingSeconds,
       allSlotsFilled,
       difficulty: question.difficulty,
+      config: config ? {
+        adMultiplier: config.adMultiplier,
+        difficultyMediumMultiplier: config.difficultyMediumMultiplier,
+        difficultyHardMultiplier: config.difficultyHardMultiplier,
+        maxTimeBonus: config.maxTimeBonus,
+      } : undefined
     });
 
     // 3. Cheat Detection
     let flagSuspicious = false;
     let suspiciousReason = null;
     
-    // Her cevap için en az 4 saniye kuralı (Örn: 10 cevap için min 40 saniye, 1 cevap için 4 saniye)
-    const minRequiredTime = submittedAnswers.length * 4;
+    // Her cevap için en az 4 saniye kuralı (Soru toplam cevap sayısı üzerinden)
+    const minRequiredTime = question.answerCount * 4;
     
     if (durationSeconds < minRequiredTime) {
       flagSuspicious = true;
@@ -215,24 +224,28 @@ export class SessionService {
   }
 
   /**
-   * Applies ad reward multiplier (x1.5).
+   * Applies ad reward multiplier.
    */
   public async applyAdReward(userId: string, sessionId: string) {
-    const session = await prisma.gameSession.findUnique({
-      where: { id: sessionId },
-      include: { 
-        question: { select: { module: true, isSpecial: true, specialEventId: true } },
-        user: { select: { countryCode: true } }
-      }
-    });
+    const [session, config] = await Promise.all([
+      prisma.gameSession.findUnique({
+        where: { id: sessionId },
+        include: { 
+          question: { select: { module: true, isSpecial: true, specialEventId: true } },
+          user: { select: { countryCode: true } }
+        }
+      }),
+      prisma.appConfig.findFirst()
+    ]);
 
     if (!session) throw new ApiError(404, ErrorCode.NOT_FOUND, 'Oturum bulunamadı.');
     if (session.userId !== userId) throw new ApiError(403, ErrorCode.FORBIDDEN, 'Bu oturum size ait değil.');
     if (session.adMultiplied) throw new ApiError(409, ErrorCode.AD_ALREADY_USED, 'Bu oturum için reklam ödülü zaten kullanıldı.');
     if (!session.submittedAt) throw new ApiError(400, ErrorCode.VALIDATION_ERROR, 'Oturum henüz tamamlanmadı.');
 
+    const adMultiplier = config?.adMultiplier || 1.5;
     const oldScoreFinal = session.scoreFinal;
-    const newScoreFinal = Math.floor(session.scoreDifficulty * 1.5);
+    const newScoreFinal = Math.floor(session.scoreDifficulty * adMultiplier);
     const scoreDiff = newScoreFinal - oldScoreFinal;
 
     await prisma.$transaction([
@@ -295,11 +308,6 @@ export class SessionService {
 
     // Normal modules
     const limit = isPremium ? 2 : 1;
-    // TODO: Consider ad-extra logic in the future. For now, check base limits.
-    // GEMINI.md Section 7 says Free gets 1, Premium gets 2.
-    // Ad-extra allows 1 more. But the check here should handle the "base" and "extra".
-    // For now, if free and sessionCount >= 1, we might need to check if they watched an ad for extra.
-    // However, the daily selector assigns questions.
     
     if (sessionCount >= limit) {
       throw new ApiError(409, ErrorCode.DAILY_LIMIT_REACHED, 'Günlük soru limitiniz doldu.');

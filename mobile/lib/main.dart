@@ -1,31 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+import 'core/constants/app_theme.dart';
+import 'core/router/app_router.dart';
+import 'core/storage/hive_storage.dart';
+import 'core/storage/prefs_storage.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Hive başlat
+  await HiveStorage.init();
+
+  // SharedPreferences ön yükleme
+  final prefs = await SharedPreferences.getInstance();
+
   runApp(
-    const ProviderScope(
-      child: FootballChallengeApp(),
+    ProviderScope(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(prefs),
+      ],
+      child: const FootballChallengeApp(),
     ),
   );
 }
 
-class FootballChallengeApp extends StatelessWidget {
+class FootballChallengeApp extends ConsumerWidget {
   const FootballChallengeApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(appRouterProvider);
+
+    return MaterialApp.router(
       title: 'Football Challenge',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        useMaterial3: true,
-      ),
-      home: const Scaffold(
-        body: Center(
-          child: Text('Football Challenge İskeleti'),
-        ),
-      ),
+      theme: AppTheme.dark(),
+      routerConfig: router,
     );
   }
 }

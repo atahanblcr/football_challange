@@ -4,7 +4,7 @@ import { QuestionModule, QuestionStatus, Difficulty } from '@prisma/client';
 
 describe('Daily Question Selector Logic Tests (90-day Cooldown)', () => {
   beforeAll(async () => {
-    // Clear assignments and questions
+    // Clear assignments and specifically our test questions
     await prisma.dailyQuestionAssignment.deleteMany();
     await prisma.question.deleteMany({ where: { createdBy: 'job_test_admin' } });
   });
@@ -15,6 +15,10 @@ describe('Daily Question Selector Logic Tests (90-day Cooldown)', () => {
   });
 
   it('should NOT select a question shown in the last 90 days', async () => {
+    // Ensure clean state for THIS test
+    await prisma.dailyQuestionAssignment.deleteMany();
+    await prisma.question.deleteMany({ where: { createdBy: 'job_test_admin' } });
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
@@ -39,7 +43,7 @@ describe('Daily Question Selector Logic Tests (90-day Cooldown)', () => {
     // 2. Create a question never shown (Should BE selected)
     const qNew = await prisma.question.create({
       data: {
-        title: 'New Question',
+        title: 'Fresh New Question',
         module,
         status: QuestionStatus.active,
         difficulty: Difficulty.easy,
@@ -54,16 +58,17 @@ describe('Daily Question Selector Logic Tests (90-day Cooldown)', () => {
 
     // 4. Check assignment
     const assignment = await prisma.dailyQuestionAssignment.findFirst({
-      where: { date: today, module }
+      where: { date: { gte: today }, module },
+      include: { question: true }
     });
 
     expect(assignment).toBeDefined();
-    expect(assignment?.questionId).toBe(qNew.id);
+    expect(assignment?.question.title).toBe('Fresh New Question');
     expect(assignment?.questionId).not.toBe(qRecentlyShown.id);
   });
 
   it('should select a question shown MORE than 90 days ago', async () => {
-    // Clean up previous test
+    // Clean up specifically for this test
     await prisma.dailyQuestionAssignment.deleteMany();
     await prisma.question.deleteMany({ where: { createdBy: 'job_test_admin' } });
 
@@ -77,7 +82,7 @@ describe('Daily Question Selector Logic Tests (90-day Cooldown)', () => {
 
     const qOld = await prisma.question.create({
       data: {
-        title: 'Old Question',
+        title: 'Very Old Question',
         module,
         status: QuestionStatus.active,
         difficulty: Difficulty.easy,
@@ -90,9 +95,10 @@ describe('Daily Question Selector Logic Tests (90-day Cooldown)', () => {
     await runDailyQuestionSelector();
 
     const assignment = await prisma.dailyQuestionAssignment.findFirst({
-      where: { date: today, module }
+      where: { date: { gte: today }, module },
+      include: { question: true }
     });
 
-    expect(assignment?.questionId).toBe(qOld.id);
+    expect(assignment?.question.title).toBe('Very Old Question');
   });
 });

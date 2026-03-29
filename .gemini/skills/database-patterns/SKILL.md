@@ -92,12 +92,16 @@ model User {
   referralCode      String           @unique @db.VarChar(10)
   referredByCode    String?          @db.VarChar(10)
 
+  timezone          String           @default("Europe/Istanbul") @db.VarChar(50)
+  dailyAdsWatched   Int              @default(0)
+  dailyQuestionsSolved Int           @default(0)
+
   subscriptionTier  SubscriptionTier @default(free)
   premiumExpiresAt  DateTime?
 
   isBanned          Boolean          @default(false)
   banSuggested      Boolean          @default(false)
-  banSuggestedBy    String?          // adminUserId
+  banSuggestedBy    String?
   banSuggestedAt    DateTime?
 
   nicknameChangedAt DateTime?
@@ -108,7 +112,6 @@ model User {
   // İlişkiler
   gameSessions      GameSession[]
   pointHistory      PointHistory[]
-  leaderboardSnapshotEntries LeaderboardSnapshot[] @relation("SnapshotUser")
 
   @@index([email])
   @@index([nickname])
@@ -164,6 +167,7 @@ model Question {
   scheduledFor DateTime?     // Programlı yayın tarihi
   publishedAt  DateTime?     // Gerçek yayın tarihi
   archivedAt   DateTime?
+  lastShownAt  DateTime?
 
   createdBy   String         // adminUserId
   createdAt   DateTime       @default(now())
@@ -211,11 +215,11 @@ model DailyQuestionAssignment {
   date       DateTime       @db.Date   // Sadece tarih (saat yok)
   module     QuestionModule
   questionId String
-  isSpecial  Boolean        @default(false)
+  isExtra    Boolean        @default(false)
 
   question   Question @relation(fields: [questionId], references: [id])
 
-  @@unique([date, module])   // Aynı günde aynı modülden sadece 1 soru
+  @@unique([date, module, isExtra])
   @@index([date])
 }
 
@@ -301,8 +305,6 @@ model LeaderboardSnapshot {
   // JSON: Array<{ rank, userId, nickname, score }>
   rankings   Json
 
-  users      User[]   @relation("SnapshotUser")
-
   @@unique([period, periodKey, scope])
   @@index([period, scope])
   @@index([snapshotAt])
@@ -316,6 +318,8 @@ model SpecialEvent {
   id          String   @id @default(cuid())
   name        String   @db.VarChar(100)
   description String?
+  icon        String?  @db.VarChar(10)
+  colorHex    String?  @db.VarChar(7)
   startsAt    DateTime
   endsAt      DateTime
   isActive    Boolean  @default(false)
@@ -341,12 +345,30 @@ model AdminUser {
   role         AdminRole @default(moderator)
   isActive     Boolean   @default(true)
 
+  createdById  String?
+  createdBy    AdminUser?  @relation("AdminCreator", fields: [createdById], references: [id])
+  createdAdmins AdminUser[] @relation("AdminCreator")
+
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
   @@index([email])
   @@index([role])
 }
+
+// ─────────────────────────────────────────────────────────────────
+// UYGULAMA KONFİGÜRASYONU
+// ─────────────────────────────────────────────────────────────────
+
+model AppConfig {
+  id              Int      @id @default(1)
+  minimum_version String   @default("1.0.0")
+  latest_version  String   @default("1.0.0")
+  force_update    Boolean  @default(false)
+  activeEventId   String?
+  updatedAt       DateTime @updatedAt
+}
+
 ```
 
 ---

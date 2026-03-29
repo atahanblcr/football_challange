@@ -301,5 +301,12 @@ model AppConfig {
   latest_version  String   @default("1.0.0")
   force_update    Boolean  @default(false)
   activeEventId   String?
+  
+  // Puanlama Çarpanları
+  adMultiplier               Float   @default(1.5)
+  difficultyMediumMultiplier Float   @default(1.25)
+  difficultyHardMultiplier   Float   @default(1.5)
+  maxTimeBonus               Int     @default(25)
+
   updatedAt       DateTime @updatedAt
 }

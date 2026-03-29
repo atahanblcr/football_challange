@@ -1,0 +1,22 @@
+class SearchResult {
+  final String entityId;
+  final String name;
+  final String? countryCode;
+  final String? imagePath;
+
+  const SearchResult({
+    required this.entityId,
+    required this.name,
+    this.countryCode,
+    this.imagePath,
+  });
+
+  factory SearchResult.fromJson(Map<String, dynamic> json) {
+    return SearchResult(
+      entityId: json['id'] as String,
+      name: json['name'] as String,
+      countryCode: json['countryCode'] as String?,
+      imagePath: json['imagePath'] as String?,
+    );
+  }
+}

@@ -40,29 +40,29 @@ export function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard 
           icon={Users}         
-          label="Aktif Kullanıcı"  
-          value={formatNumber(stats.activeUsers ?? 0)}  
-          description="Son 7 gün"
+          label="DAU / MAU"  
+          value={`${formatNumber(stats.dau ?? 0)} / ${formatNumber(stats.mau ?? 0)}`}     
+          description="Son 24s / Son 30g"
+          colorClass="text-primary"
+        />
+        <StatCard 
+          icon={Users}   
+          label="Toplam / Yeni"  
+          value={`${formatNumber(stats.totalUsers ?? 0)} / ${formatNumber(stats.newUsersToday ?? 0)}`}     
+          description="Toplam / Bugün Kayıt"
         />
         <StatCard 
           icon={CheckCircle}   
           label="Çözülen Oturum"  
           value={formatNumber(stats.sessions ?? 0)}     
-          description="Bugün"
+          description="Bugün tamamlanan"
           colorClass="text-correct"
         />
         <StatCard 
           icon={TrendingUp}    
-          label="Tamamlama Oranı" 
-          value={`${stats.completionRate ?? 0}%`}       
-          description="submitted / started"
-          colorClass="text-primary"
-        />
-        <StatCard 
-          icon={TrendingUp}    
-          label="Ort. Puan/Soru"  
-          value={(stats.avgScore ?? 0).toFixed(1)}      
-          description="Bugün ortalaması"
+          label="Ort. Puan / Tamamlama"  
+          value={`${(stats.avgScore ?? 0).toFixed(1)} / ${stats.completionRate ?? 0}%`}      
+          description="Puan / Oran (%)"
         />
       </div>
 
