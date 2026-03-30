@@ -11,7 +11,7 @@ export class SessionController {
       const userId = (req as any).user!.id; // Authenticated user ID
 
       const session = await SessionService.startSession(userId, questionId);
-      res.status(201).json(session);
+      res.status(201).json({ data: session });
     } catch (error) {
       next(error);
     }
@@ -23,11 +23,14 @@ export class SessionController {
   public async submitSession(req: Request, res: Response, next: NextFunction) {
     try {
       const { id: sessionId } = req.params;
-      const { answers } = req.body;
+      const { answers, entityIds } = req.body;
       const userId = (req as any).user!.id;
 
-      const result = await SessionService.submitSession(userId, sessionId, answers);
-      res.json(result);
+      // Hem 'answers' hem 'entityIds' (mobil) desteği
+      const finalAnswers = answers || entityIds || [];
+
+      const result = await SessionService.submitSession(userId, sessionId, finalAnswers);
+      res.json({ data: result });
     } catch (error) {
       next(error);
     }
@@ -42,7 +45,7 @@ export class SessionController {
       const userId = (req as any).user!.id;
 
       const result = await SessionService.getSessionResult(userId, sessionId);
-      res.json(result);
+      res.json({ data: result });
     } catch (error) {
       next(error);
     }
@@ -57,7 +60,7 @@ export class SessionController {
       const userId = (req as any).user!.id;
 
       const result = await SessionService.applyAdReward(userId, sessionId);
-      res.json(result);
+      res.json({ data: result });
     } catch (error) {
       next(error);
     }

@@ -55,7 +55,6 @@ class _AdRewardButtonWidgetState extends ConsumerState<AdRewardButtonWidget> {
               
               await ref.read(resultRepositoryProvider).claimAdReward(
                 sessionId: widget.sessionId,
-                rewardToken: 'admob_reward_${DateTime.now().millisecondsSinceEpoch}',
               );
 
               if (mounted) {

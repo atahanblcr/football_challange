@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 import '../../../core/network/dio_client.dart';
+import '../../../core/network/api_endpoints.dart';
 import '../domain/result_model.dart';
 
 class ResultRepository {
@@ -8,22 +9,16 @@ class ResultRepository {
 
   ResultRepository(this._dio);
 
+  Future<SessionResult> getResult(String sessionId) async {
+    final response = await _dio.get(ApiEndpoints.sessionResult(sessionId));
+    return SessionResult.fromJson(response.data['data']);
+  }
+
   Future<void> claimAdReward({
     required String sessionId,
-    required String rewardToken,
   }) async {
-    await _dio.post(
-      '/api/v1/sessions/$sessionId/ad-reward',
-      data: {'rewardToken': rewardToken},
-    );
+    await _dio.post(ApiEndpoints.adReward(sessionId));
   }
-
-  Future<SessionResult> getResult(String sessionId) async {
-    final response = await _dio.get('/api/v1/sessions/$sessionId/result');
-    return SessionResult.fromJson(response.data);
-  }
-
-  // Gerekirse başka result-related metodlar eklenebilir
 }
 
 final resultRepositoryProvider = Provider<ResultRepository>((ref) {

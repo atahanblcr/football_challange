@@ -116,6 +116,11 @@ export const adminQuestionsService = {
   create: async (data: any) => {
     const { answers, ...questionData } = data;
 
+    // specialEventId boş string ise null yap (Foreign Key hatasını önlemek için)
+    if (questionData.specialEventId === "") {
+      questionData.specialEventId = null;
+    }
+
     return prisma.$transaction(async (tx) => {
       const question = await tx.question.create({
         data: {
@@ -133,12 +138,45 @@ export const adminQuestionsService = {
         include: { answers: true }
       });
 
+      // Eğer tarih (scheduledFor) belirtilmişse, DailyQuestionAssignment'a da ekle
+      if (questionData.scheduledFor) {
+        // ISO string veya tarih dizesinden sadece YYYY-MM-DD kısmını al
+        const datePart = typeof questionData.scheduledFor === 'string' 
+          ? questionData.scheduledFor.split('T')[0] 
+          : new Date(questionData.scheduledFor).toISOString().split('T')[0];
+
+        const [year, month, day] = datePart.split('-').map(Number);
+        const scheduledDate = new Date(Date.UTC(year, month - 1, day));
+
+        await tx.dailyQuestionAssignment.upsert({
+          where: {
+            date_module_isExtra: {
+              date: scheduledDate,
+              module: question.module,
+              isExtra: false,
+            }
+          },
+          update: { questionId: question.id },
+          create: {
+            date: scheduledDate,
+            module: question.module,
+            questionId: question.id,
+            isExtra: false,
+          }
+        });
+      }
+
       return question;
     });
   },
 
   update: async (id: string, data: any) => {
     const { answers, ...questionData } = data;
+
+    // specialEventId boş string ise null yap (Foreign Key hatasını önlemek için)
+    if (questionData.specialEventId === "") {
+      questionData.specialEventId = null;
+    }
 
     return prisma.$transaction(async (tx) => {
       // Önce mevcut cevapları sil
@@ -164,6 +202,34 @@ export const adminQuestionsService = {
         },
         include: { answers: true }
       });
+
+      // Eğer tarih (scheduledFor) belirtilmişse veya güncellenmişse, DailyQuestionAssignment'ı da güncelle
+      if (questionData.scheduledFor) {
+        // ISO string veya tarih dizesinden sadece YYYY-MM-DD kısmını al
+        const datePart = typeof questionData.scheduledFor === 'string' 
+          ? questionData.scheduledFor.split('T')[0] 
+          : new Date(questionData.scheduledFor).toISOString().split('T')[0];
+
+        const [year, month, day] = datePart.split('-').map(Number);
+        const scheduledDate = new Date(Date.UTC(year, month - 1, day));
+
+        await tx.dailyQuestionAssignment.upsert({
+          where: {
+            date_module_isExtra: {
+              date: scheduledDate,
+              module: question.module,
+              isExtra: false,
+            }
+          },
+          update: { questionId: question.id },
+          create: {
+            date: scheduledDate,
+            module: question.module,
+            questionId: question.id,
+            isExtra: false,
+          }
+        });
+      }
 
       return question;
     });

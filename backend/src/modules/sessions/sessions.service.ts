@@ -20,7 +20,13 @@ export class SessionService {
     const existingSession = await prisma.gameSession.findUnique({
       where: { userId_questionId: { userId, questionId } },
     });
-    if (existingSession) {
+
+    // GELİŞTİRME MODUNDA: Eğer oturum varsa silip yenisini başlatalım (Test kolaylığı için)
+    if (existingSession && process.env.NODE_ENV === 'development') {
+      await prisma.gameSession.delete({
+        where: { id: existingSession.id }
+      });
+    } else if (existingSession) {
       throw new ApiError(409, ErrorCode.SESSION_ALREADY_EXISTS, 'Bu soruyu zaten çözdünüz.');
     }
 
@@ -41,11 +47,16 @@ export class SessionService {
       },
     });
 
-    // 4. Return session ID and Question Title (now it's safe)
+    // 4. Return session ID and Question details
     const fullQuestion = await QuestionService.getQuestionById(questionId);
     return {
       sessionId: session.id,
+      questionId: fullQuestion.id,
       questionTitle: fullQuestion.title,
+      module: fullQuestion.module,
+      difficulty: fullQuestion.difficulty,
+      answerCount: fullQuestion.answerCount,
+      timeLimit: fullQuestion.timeLimit,
       startedAt: session.startedAt,
     };
   }
@@ -160,7 +171,8 @@ export class SessionService {
       });
     }
 
-    return this.getSessionResult(userId, sessionId);
+    // Mobil uygulama doğrudan sonuçları bekliyor (getSessionResult ile aynı format)
+    return await this.getSessionResult(userId, sessionId);
   }
 
   /**
@@ -283,6 +295,8 @@ export class SessionService {
    * Checks if the user has reached their daily limit.
    */
   private async checkDailyLimit(user: any, module: QuestionModule, isSpecial: boolean) {
+    if (process.env.NODE_ENV === 'development') return;
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 

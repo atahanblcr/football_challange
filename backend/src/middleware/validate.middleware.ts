@@ -15,6 +15,8 @@ export const validate = (schema: AnyZodObject) => {
       });
       next();
     } catch (error) {
+      console.error('Validation Error Details:', JSON.stringify(error, null, 2));
+      console.error('Request Body:', JSON.stringify(req.body, null, 2));
       next(error);
     }
   };

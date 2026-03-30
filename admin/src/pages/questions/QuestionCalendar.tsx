@@ -108,9 +108,11 @@ export function QuestionCalendar() {
               ) : (
                 days.map((day) => {
                   const dayStr = format(day, 'yyyy-MM-dd');
-                  const dayAssignments = (assignments ?? []).filter((a: any) => 
-                    format(new Date(a.date), 'yyyy-MM-dd') === dayStr
-                  );
+                  const dayAssignments = (assignments ?? []).filter((a: any) => {
+                    // API'den gelen ISO string'in (2026-03-30T00:00:00.000Z) tarih kısmını al
+                    const assignmentDateStr = a.date.split('T')[0];
+                    return assignmentDateStr === dayStr;
+                  });
                   
                   const isCurrentMonth = isSameDay(startOfMonth(day), monthStart);
 
@@ -131,11 +133,13 @@ export function QuestionCalendar() {
 
                       <div className="space-y-1">
                         {MODULES.map(mod => {
-                          const ass = dayAssignments.find((a: any) => a.question.module === mod);
+                          const ass = dayAssignments.find((a: any) => 
+                            a.module === mod || a.question?.module === mod
+                          );
                           return (
                             <div 
                               key={mod}
-                              title={ass ? ass.question.title : 'Eksik Atama'}
+                              title={ass ? ass.question?.title : `${MODULE_LABELS[mod]} Eksik`}
                               className={`h-1.5 rounded-full transition-all ${
                                 ass ? 'bg-correct' : 'bg-wrong opacity-30 group-hover:opacity-100'
                               }`}
@@ -151,12 +155,14 @@ export function QuestionCalendar() {
                         </span>
                         <div className="space-y-1.5 overflow-y-auto">
                           {MODULES.map(mod => {
-                            const ass = dayAssignments.find((a: any) => a.question.module === mod);
+                            const ass = dayAssignments.find((a: any) => 
+                              a.module === mod || a.question?.module === mod
+                            );
                             return (
                               <div key={mod} className="flex items-center gap-1.5">
                                 <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${ass ? 'bg-correct' : 'bg-wrong'}`} />
                                 <span className="text-[9px] text-slate-300 truncate max-w-[100px]">
-                                  {ass ? ass.question.title : `${MODULE_LABELS[mod]} Eksik`}
+                                  {ass ? ass.question?.title : `${MODULE_LABELS[mod]} Eksik`}
                                 </span>
                               </div>
                             );

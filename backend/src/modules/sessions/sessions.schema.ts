@@ -11,7 +11,8 @@ export const submitSessionSchema = z.object({
     id: z.string(),
   }),
   body: z.object({
-    answers: z.array(z.string()).min(1),
+    answers: z.array(z.string()).optional(),
+    entityIds: z.array(z.string()).optional(),
   })
 });
 
