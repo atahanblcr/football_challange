@@ -5,6 +5,8 @@ import 'api_endpoints.dart';
 
 class AuthInterceptor extends Interceptor {
   final Ref _ref;
+  bool _isRefreshing = false;
+  final List<Map<String, dynamic>> _failedRequestsQueue = [];
 
   AuthInterceptor(this._ref);
 
@@ -20,16 +22,42 @@ class AuthInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     if (err.response?.statusCode == 401) {
+      if (_isRefreshing) {
+        // Queue the request
+        _failedRequestsQueue.add({
+          'options': err.requestOptions,
+          'handler': handler,
+        });
+        return;
+      }
+
+      _isRefreshing = true;
       try {
         final newToken = await _refreshToken();
         if (newToken != null) {
+          // Retry the current request
           err.requestOptions.headers['Authorization'] = 'Bearer $newToken';
-          final retryResponse = await Dio().fetch(err.requestOptions);
-          handler.resolve(retryResponse);
+          final response = await Dio().fetch(err.requestOptions);
+          
+          // Retry queued requests
+          for (final req in _failedRequestsQueue) {
+            final options = req['options'] as RequestOptions;
+            final qHandler = req['handler'] as ErrorInterceptorHandler;
+            options.headers['Authorization'] = 'Bearer $newToken';
+            final qResponse = await Dio().fetch(options);
+            qHandler.resolve(qResponse);
+          }
+          _failedRequestsQueue.clear();
+          
+          handler.resolve(response);
           return;
         }
       } catch (_) {
+        _failedRequestsQueue.clear();
         await _ref.read(secureStorageProvider).clearAll();
+        // Redirect to login if needed (handled by auth provider/router)
+      } finally {
+        _isRefreshing = false;
       }
     }
     handler.next(err);

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/services/ad_service.dart';
 import '../result_provider.dart';
 import '../../data/result_repository.dart';
 
@@ -16,24 +18,68 @@ class AdRewardButtonWidget extends ConsumerStatefulWidget {
 
 class _AdRewardButtonWidgetState extends ConsumerState<AdRewardButtonWidget> {
   bool _isLoading = false;
+  RewardedAd? _rewardedAd;
 
-  Future<void> _showAdAndClaim() async {
+  @override
+  void dispose() {
+    _rewardedAd?.dispose();
+    super.dispose();
+  }
+
+  void _showAdAndClaim() {
     setState(() => _isLoading = true);
     
-    // TODO: Google Mobile Ads Integration
-    // Simulate ad delay
-    await Future.delayed(const Duration(seconds: 2));
+    AdService.loadRewardedAd(
+      onAdLoaded: (ad) {
+        _rewardedAd = ad;
+        _rewardedAd!.fullScreenContentCallback = FullScreenContentCallback(
+          onAdDismissedFullScreenContent: (ad) {
+            ad.dispose();
+            _rewardedAd = null;
+            if (mounted) setState(() => _isLoading = false);
+          },
+          onAdFailedToShowFullScreenContent: (ad, error) {
+            ad.dispose();
+            _rewardedAd = null;
+            if (mounted) setState(() => _isLoading = false);
+          },
+        );
 
-    try {
-      await ref.read(resultRepositoryProvider).claimAdReward(widget.sessionId);
-      ref.invalidate(sessionResultProvider(widget.sessionId));
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
-      }
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
+        _rewardedAd!.show(
+          onUserEarnedReward: (AdWithoutView ad, RewardItem reward) async {
+            // Reward earned!
+            try {
+              // Note: Google's SSV reward verification happens server-to-server.
+              // Here we just notify the backend that the user finished the ad.
+              // For extra security, Google's SSV callback can be used on the backend.
+              
+              await ref.read(resultRepositoryProvider).claimAdReward(
+                sessionId: widget.sessionId,
+                rewardToken: 'admob_reward_${DateTime.now().millisecondsSinceEpoch}',
+              );
+
+              if (mounted) {
+                ref.invalidate(sessionResultProvider(widget.sessionId));
+              }
+            } catch (e) {
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Hata: ${e.toString()}'))
+                );
+              }
+            }
+          },
+        );
+      },
+      onAdFailedToLoad: (error) {
+        if (mounted) {
+          setState(() => _isLoading = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Reklam yüklenemedi. Lütfen tekrar deneyin.'))
+          );
+        }
+      },
+    );
   }
 
   @override

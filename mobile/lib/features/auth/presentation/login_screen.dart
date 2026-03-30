@@ -21,18 +21,37 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _passwordController = TextEditingController();
 
   Future<void> _loginEmail() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (email.isEmpty || !email.contains('@')) {
+      _showError('Geçerli bir e-posta adresi giriniz!');
+      return;
+    }
+
+    if (password.length < 6) {
+      _showError('Şifre en az 6 karakter olmalıdır!');
+      return;
+    }
+
     try {
-      await ref.read(authStateProvider.notifier).loginWithEmail(
-        _emailController.text.trim(),
-        _passwordController.text.trim(),
-      );
+      await ref.read(authStateProvider.notifier).loginWithEmail(email, password);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString()), backgroundColor: AppColors.wrong),
-        );
+        _showError(e.toString());
       }
     }
+  }
+
+  void _showError(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: AppColors.wrong,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   @override

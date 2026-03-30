@@ -33,7 +33,9 @@ describe('Admin Questions Integration Tests', () => {
 
   afterAll(async () => {
     // Cleanup
-    await prisma.questionAnswer.deleteMany();
+    await prisma.questionAnswer.deleteMany({
+      where: { question: { createdBy: adminId } }
+    });
     await prisma.question.deleteMany({ where: { createdBy: adminId } });
     await prisma.entity.deleteMany({ where: { id: { in: testEntityIds } } });
     await prisma.adminUser.delete({ where: { id: adminId } });

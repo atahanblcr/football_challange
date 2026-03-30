@@ -8,23 +8,35 @@ describe('Daily Question Selector Logic Tests (90-day Cooldown)', () => {
   const testAdminId = 'job_test_admin';
 
   beforeAll(async () => {
-    // 1. First cleanup ANY existing data that could interfere
-    await prisma.gameSession.deleteMany();
-    await prisma.dailyQuestionAssignment.deleteMany();
-    await prisma.questionAnswer.deleteMany();
-    // 2. Clear ALL questions for our test module specifically
-    await prisma.question.deleteMany({ where: { module: testModule } });
+    // Selective cleanup: only delete what this test created or related to test module
+    await prisma.gameSession.deleteMany({
+      where: { question: { createdBy: testAdminId } }
+    });
+    await prisma.dailyQuestionAssignment.deleteMany({
+      where: { question: { createdBy: testAdminId } }
+    });
+    await prisma.questionAnswer.deleteMany({
+      where: { question: { createdBy: testAdminId } }
+    });
+    await prisma.question.deleteMany({ where: { createdBy: testAdminId } });
   });
 
   afterAll(async () => {
-    await prisma.dailyQuestionAssignment.deleteMany();
+    await prisma.gameSession.deleteMany({
+      where: { question: { createdBy: testAdminId } }
+    });
+    await prisma.dailyQuestionAssignment.deleteMany({
+      where: { question: { createdBy: testAdminId } }
+    });
     await prisma.question.deleteMany({ where: { createdBy: testAdminId } });
   });
 
   it('should only select an ACTIVE question that is NOT in cooldown', async () => {
-    // Clear for this test specifically
-    await prisma.dailyQuestionAssignment.deleteMany();
-    await prisma.question.deleteMany({ where: { module: testModule } });
+    // Clear for this test specifically using testAdminId
+    await prisma.dailyQuestionAssignment.deleteMany({
+      where: { question: { createdBy: testAdminId } }
+    });
+    await prisma.question.deleteMany({ where: { createdBy: testAdminId } });
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -90,8 +102,13 @@ describe('Daily Question Selector Logic Tests (90-day Cooldown)', () => {
     await runDailyQuestionSelector();
 
     // Verify assignment for our module
+    // Note: If multiple questions are eligible (seed data), we filter by createdBy
     const assignment = await prisma.dailyQuestionAssignment.findFirst({
-      where: { date: { gte: today }, module: testModule },
+      where: { 
+        date: { gte: today }, 
+        module: testModule,
+        question: { createdBy: testAdminId } // Ensure we only verify our test question
+      },
       include: { question: true }
     });
 

@@ -1,0 +1,41 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:golden_toolkit/golden_toolkit.dart';
+import 'package:football_challenge/features/result/presentation/result_screen.dart';
+import 'package:football_challenge/features/result/presentation/result_provider.dart';
+import 'package:football_challenge/features/result/domain/result_model.dart';
+
+void main() {
+  testGoldens('ResultScreen Golden Test', (tester) async {
+    final builder = DeviceBuilder()
+      ..addScenario(
+        name: 'Default Result',
+        widget: const ResultScreen(sessionId: 's1'),
+      );
+
+    await tester.pumpDeviceBuilder(
+      builder,
+      wrapper: (child) => ProviderScope(
+        overrides: [
+          sessionResultProvider('s1').overrideWith(
+            (ref) => SessionResult(
+              sessionId: 's1',
+              questionTitle: 'Test Question',
+              scoreBase: 100,
+              scoreTimeBonus: 20,
+              scoreDifficulty: 150,
+              scoreFinal: 180,
+              adMultiplied: false,
+              wrongAnswersCount: 0,
+              answers: [],
+            ),
+          ),
+        ],
+        child: child,
+      ),
+    );
+
+    await screenMatchesGolden(tester, 'result_screen_default');
+  });
+}

@@ -70,6 +70,8 @@ model User {
   referredByCode    String?          @db.VarChar(10)
 
   timezone          String           @default("Europe/Istanbul") @db.VarChar(50)
+  fcmToken          String?          @db.VarChar(255)
+  pushNotificationsEnabled Boolean      @default(true)
   dailyAdsWatched   Int              @default(0)
   dailyQuestionsSolved Int           @default(0)
 

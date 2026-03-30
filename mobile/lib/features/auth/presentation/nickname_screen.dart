@@ -22,7 +22,8 @@ class _NicknameScreenState extends ConsumerState<NicknameScreen> {
   String? _error;
 
   Future<void> _checkNickname(String val) async {
-    if (val.length < 3) {
+    final trimmed = val.trim();
+    if (trimmed.length < 3) {
       setState(() {
         _isAvailable = false;
         _error = 'En az 3 karakter olmalı';
@@ -30,14 +31,23 @@ class _NicknameScreenState extends ConsumerState<NicknameScreen> {
       return;
     }
 
+    if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(trimmed)) {
+      setState(() {
+        _isAvailable = false;
+        _error = 'Sadece harf, rakam ve alt çizgi (_)';
+      });
+      return;
+    }
+
     try {
-      final available = await ref.read(authRepositoryProvider).checkNickname(val);
+      final available = await ref.read(authRepositoryProvider).checkNickname(trimmed);
       setState(() {
         _isAvailable = available;
         _error = available ? null : 'Bu nickname zaten alınmış';
       });
     } catch (e) {
-      // Sessiz hata
+      // API hatası durumunda kullanıcıyı engelleme ama uyar
+      setState(() => _error = 'Bağlantı sorunu');
     }
   }
 

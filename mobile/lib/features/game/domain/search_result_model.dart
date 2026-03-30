@@ -15,11 +15,37 @@ class SearchResult {
 
   factory SearchResult.fromJson(Map<String, dynamic> json) {
     return SearchResult(
-      entityId: json['id'] as String,
+      entityId: (json['id'] ?? json['entityId']) as String,
       name: json['name'] as String,
       clubName: json['clubName'] as String?,
       countryCode: json['countryCode'] as String?,
       imagePath: json['imagePath'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'entityId': entityId,
+      'name': name,
+      'clubName': clubName,
+      'countryCode': countryCode,
+      'imagePath': imagePath,
+    };
+  }
+
+  SearchResult copyWith({
+    String? entityId,
+    String? name,
+    String? clubName,
+    String? countryCode,
+    String? imagePath,
+  }) {
+    return SearchResult(
+      entityId: entityId ?? this.entityId,
+      name: name ?? this.name,
+      clubName: clubName ?? this.clubName,
+      countryCode: countryCode ?? this.countryCode,
+      imagePath: imagePath ?? this.imagePath,
     );
   }
 }

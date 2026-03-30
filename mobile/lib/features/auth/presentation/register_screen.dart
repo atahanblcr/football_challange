@@ -20,26 +20,44 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _confirmPasswordController = TextEditingController();
 
   Future<void> _register() async {
-    if (_passwordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Şifreler uyuşmuyor!'), backgroundColor: AppColors.wrong),
-      );
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+    final confirmPassword = _confirmPasswordController.text.trim();
+
+    if (email.isEmpty || !email.contains('@')) {
+      _showError('Geçerli bir e-posta adresi giriniz!');
+      return;
+    }
+
+    if (password.length < 6) {
+      _showError('Şifre en az 6 karakter olmalıdır!');
+      return;
+    }
+
+    if (password != confirmPassword) {
+      _showError('Şifreler uyuşmuyor!');
       return;
     }
 
     try {
-      await ref.read(authStateProvider.notifier).registerWithEmail(
-        _emailController.text.trim(),
-        _passwordController.text.trim(),
-      );
+      await ref.read(authStateProvider.notifier).registerWithEmail(email, password);
       // Başarılı olursa auth state otomatik olarak nickname ekranına yönlendirecek
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString()), backgroundColor: AppColors.wrong),
-        );
+        _showError(e.toString());
       }
     }
+  }
+
+  void _showError(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: AppColors.wrong,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   @override

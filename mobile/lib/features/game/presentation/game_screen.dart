@@ -25,7 +25,7 @@ class GameScreen extends ConsumerWidget {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    final gameState = ref.watch(gameNotifierProvider);
+    final gameState = ref.watch(gameNotifierProvider(sessionId));
     final selectedCount = gameState.selectedAnswers.length;
     final isFull = selectedCount == session.answerCount;
 
@@ -85,7 +85,10 @@ class GameScreen extends ConsumerWidget {
               // Autocomplete
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: AutocompleteWidget(entityType: session.module),
+                child: AutocompleteWidget(
+                  entityType: session.module,
+                  sessionId: sessionId,
+                ),
               ),
 
               const SizedBox(height: 24),
@@ -106,7 +109,7 @@ class GameScreen extends ConsumerWidget {
                           children: [
                             ...gameState.selectedAnswers.map((a) => AnswerSlotWidget(
                               answer: a,
-                              onRemove: () => ref.read(gameNotifierProvider.notifier).removeAnswer(a.entityId),
+                              onRemove: () => ref.read(gameNotifierProvider(sessionId).notifier).removeAnswer(a.entityId),
                             )),
                             ...List.generate(session.answerCount - selectedCount, (_) => const EmptySlotWidget()),
                           ],
@@ -135,7 +138,7 @@ class GameScreen extends ConsumerWidget {
 
   Future<void> _submit(BuildContext context, WidgetRef ref, GameSession session) async {
     try {
-      await ref.read(gameNotifierProvider.notifier).submit(session.sessionId);
+      await ref.read(gameNotifierProvider(session.sessionId).notifier).submit(session.sessionId);
       if (context.mounted) {
         context.pushReplacementNamed(
           RouteNames.result,
@@ -158,7 +161,10 @@ class GameScreen extends ConsumerWidget {
         content: const Text('Çıkarsan süre dolduğunda 0 puan alırsın ve bu hakkın yanar.'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Devam Et')),
-          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Çık', style: TextStyle(color: AppColors.wrong))),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true), 
+            child: const Text('Çık', style: TextStyle(color: AppColors.wrong))
+          ),
         ],
       ),
     );

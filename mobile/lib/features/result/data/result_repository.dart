@@ -8,8 +8,14 @@ class ResultRepository {
 
   ResultRepository(this._dio);
 
-  Future<void> claimAdReward(String sessionId) async {
-    await _dio.post('/api/v1/sessions/$sessionId/ad-reward');
+  Future<void> claimAdReward({
+    required String sessionId,
+    required String rewardToken,
+  }) async {
+    await _dio.post(
+      '/api/v1/sessions/$sessionId/ad-reward',
+      data: {'rewardToken': rewardToken},
+    );
   }
 
   Future<SessionResult> getResult(String sessionId) async {

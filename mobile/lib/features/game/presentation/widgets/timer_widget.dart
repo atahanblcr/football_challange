@@ -43,7 +43,9 @@ class _TimerWidgetState extends State<TimerWidget>
     if (_expired) return;
 
     final elapsed = DateTime.now().difference(widget.startedAt).inSeconds;
-    final remaining = widget.timeLimitSeconds - elapsed;
+    // Cap elapsed at 0 in case device time is behind server startedAt
+    final safeElapsed = elapsed < 0 ? 0 : elapsed;
+    final remaining = widget.timeLimitSeconds - safeElapsed;
 
     if (remaining <= 0) {
       if (!_expired) {

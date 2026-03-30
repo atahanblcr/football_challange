@@ -33,7 +33,7 @@ export class UsersService {
    * Nickname değişirse cooldown kontrolü yapılabilir (İsteğe bağlı).
    */
   async updateMe(userId: string, data: any) {
-    const { nickname, avatarIndex, countryCode } = data;
+    const { nickname, avatarIndex, countryCode, fcmToken, pushNotificationsEnabled } = data;
 
     if (nickname) {
       const existing = await prisma.user.findFirst({
@@ -48,9 +48,11 @@ export class UsersService {
         nickname,
         avatarIndex,
         countryCode,
+        fcmToken,
+        pushNotificationsEnabled,
         nicknameChangedAt: nickname ? new Date() : undefined,
       },
-      select: { id: true, nickname: true, avatarIndex: true, countryCode: true }
+      select: { id: true, nickname: true, avatarIndex: true, countryCode: true, pushNotificationsEnabled: true }
     });
 
     return user;

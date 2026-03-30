@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import { env } from './config/env';
 import { redis } from './config/redis';
+import { initFirebase } from './config/firebase';
 import { errorHandlerMiddleware } from './middleware/error-handler.middleware';
 import { startAllJobs } from './jobs';
 import authRouter from './modules/auth/auth.router';
@@ -60,6 +61,7 @@ if (require.main === module) {
   const PORT = env.PORT;
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT} in ${env.NODE_ENV} mode`);
+    initFirebase();
     startAllJobs();
   });
 }

@@ -8,8 +8,13 @@ import '../game_provider.dart';
 
 class AutocompleteWidget extends ConsumerStatefulWidget {
   final String entityType;
+  final String sessionId;
 
-  const AutocompleteWidget({super.key, required this.entityType});
+  const AutocompleteWidget({
+    super.key,
+    required this.entityType,
+    required this.sessionId,
+  });
 
   @override
   ConsumerState<AutocompleteWidget> createState() => _AutocompleteWidgetState();
@@ -37,7 +42,7 @@ class _AutocompleteWidgetState extends ConsumerState<AutocompleteWidget> {
   }
 
   void _onSelect(SearchResult result) {
-    ref.read(gameNotifierProvider.notifier).addAnswer(result);
+    ref.read(gameNotifierProvider(widget.sessionId).notifier).addAnswer(result);
     _controller.clear();
     setState(() => _query = '');
     _focusNode.unfocus();
@@ -45,7 +50,7 @@ class _AutocompleteWidgetState extends ConsumerState<AutocompleteWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final params = (query: _query, entityType: widget.entityType);
+    final params = (query: _query, entityType: widget.entityType, sessionId: widget.sessionId);
     final resultsAsync = ref.watch(searchResultsProvider(params));
 
     return Column(

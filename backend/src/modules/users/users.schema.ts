@@ -10,6 +10,8 @@ export const updateProfileSchema = z.object({
       .optional(),
     avatarIndex: z.number().int().min(0).max(50).optional(),
     countryCode: z.string().length(2, 'Geçersiz ülke kodu').optional(),
+    fcmToken: z.string().max(255).optional(),
+    pushNotificationsEnabled: z.boolean().optional(),
   })
 });
 
