@@ -1,22 +1,16 @@
 # AKTİF ÇALIŞMA BAĞLAMI (ACTIVE CONTEXT)
 
-**Şu Anki Faz:** Proje Tamamlandı (Final Release Ready)
-**Şu Anki Görev:** Devir ve Final Kontrol
-
-## Mevcut Odak Noktası
-- **İçerik:** 242+ gerçek futbol sorusu (Players, Clubs, Nationals, Managers) veritabanına yüklendi.
-- **FCM Entegrasyonu:** Backend (firebase-admin) ve Mobil (firebase_messaging) uçtan uca bağlandı. fcmToken senkronizasyonu aktif.
-- **AdMob Entegrasyonu:** AdService ve AdRewardButtonWidget ile gerçek reklam akışı kuruldu.
-- **Pazarlama:** Store metadataları ve görsel taslakları (MARKETING.md) hazırlandı.
+**Şu Anki Faz:** Proje Finalizasyon ve Canlıya Hazırlık
+**Durum:** Duraklatıldı (Kullanıcı Beklemede)
 
 ## Son Yapılan İşlemler
-- **Seeding:** Dev veri seti (1202+ cevap) prisma/content_seed.ts ile aktarıldı.
-- **Notification Service:** Backend'de NotificationService, Mobil'de NotificationService (FCM) implemente edildi.
-- **Auth UX Fixes:** Register, Login ve Nickname ekranlarına min şifre uzunluğu (6), e-posta formatı ve geçersiz karakter kontrolleri eklendi. Hatalı girişlerde yönlendirme yerine SnackBar/errorText ile bilgilendirme sağlandı.
-- **Profile Update:** User modeline fcmToken ve pushNotificationsEnabled alanları eklendi.
+- **Firebase:** `flutterfire configure` ile senkronizasyon sağlandı. `firebase_options.dart` hazır.
+- **Android Fix:** Missing `settings.gradle` sorunu çözüldü.
+- **AdMob Setup:** iOS ve Android platformları için gerekli manifest ve plist güncellemeleri (Test ID'leri ile) yapıldı.
+- **Main Entry:** `main.dart` Firebase initialize işlemi finalize edildi.
 
-## Sıradaki Adımlar
-1. Apple Store ve Play Store geliştirici hesaplarına yükleme.
-2. FIREBASE_SERVICE_ACCOUNT_JSON ve ADMOB_ID'lerin canlı değerlerle güncellenmesi.
-3. Soft launch ve kullanıcı geri bildirim döngüsü.
+## Bir Sonraki Oturumda Yapılacaklar (Kritik)
+1. **AdMob ID Güncellemesi:** Kullanıcıdan gelecek gerçek App ID ve Ad Unit ID'ler `AndroidManifest.xml`, `Info.plist` ve `ad_service.dart` dosyalarına girilecek.
+2. **Backend Push Setup:** `backend/firebase-service-account.json` dosyası kullanıcı tarafından eklenecek ve `backend/.env` içerisindeki yol doğrulanacak.
+3. **Validation:** Uygulamanın bir simülatörde çalıştırılarak bildirim ve reklam akışının test edilmesi.
 

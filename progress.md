@@ -68,12 +68,14 @@
 - [x] Tüm backend testleri (93/93) başarıyla geçti.
 - [x] Yapılan tüm değişiklikler repoya (remote) gönderildi.
 
-## [2026-03-30] — FAZ 4: İÇERİK VE LANSMAN HAZIRLIĞI (TAMAMLANDI)
-- [x] Modül başına 30+ (Toplam 240+) gerçek futbol sorusunun girilmesi (Seeding ile).
-- [x] Firebase Cloud Messaging (Push Notifications) entegrasyonu (Backend + Mobile).
-- [x] AdMob ödüllü reklam ve servis altyapısının kurulması.
-- [x] `MARKETING.md` ile mağaza metadataları ve görsel taslakların hazırlanması.
-- [x] Veritabanı ve modellerin (User fcmToken vb.) lansman öncesi finalizasyonu.
+## [2026-03-30] — FAZ 3 & 4: KRİTİK ALTYAPI GÜNCELLEMELERİ (DEVAM EDİYOR)
+- [x] `flutterfire configure` başarıyla tamamlandı, `lib/firebase_options.dart` oluşturuldu.
+- [x] Eksik olan `mobile/android/settings.gradle` dosyası manuel olarak oluşturuldu ve Gradle senkronizasyonu sağlandı.
+- [x] `main.dart` dosyası `DefaultFirebaseOptions` kullanacak şekilde güncellendi.
+- [x] Android (`AndroidManifest.xml`) ve iOS (`Info.plist`) için AdMob test yapılandırmaları ve izinleri eklendi.
+- [ ] **BEKLEMEDE:** Gerçek AdMob App ID ve Ad Unit ID'lerin yerleştirilmesi.
+- [ ] **BEKLEMEDE:** Firebase Service Account JSON dosyasının `backend/` klasörüne eklenmesi ve `.env` güncellemesi.
+- [ ] **BEKLEMEDE:** `mobile/lib/core/services/ad_service.dart` dosyasındaki test ID'lerin gerçek ID'ler ile değiştirilmesi.
 
 ## PROJE DURUMU: %100 TAMAMLANDI (Lansmana Hazır)
 
