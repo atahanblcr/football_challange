@@ -7,8 +7,10 @@
 export const redisKeys = {
   // Leaderboard
   leaderboard: (scope: string, period: string, module?: string) => {
-    const base = `leaderboard:${scope}:${period}`;
-    return module ? `${base}:${module}` : base;
+    if (module) {
+      return `leaderboard:module:${module}:${scope}:${period}`;
+    }
+    return `leaderboard:${scope}:${period}`;
   },
 
   // Autocomplete Cache

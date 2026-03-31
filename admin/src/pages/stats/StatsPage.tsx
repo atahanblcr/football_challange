@@ -22,7 +22,7 @@ export function StatsPage() {
   }
 
   const stats = data?.today ?? {};
-  const pool = data?.poolHealth ?? [];
+  const poolHealth = data?.poolHealth ?? [];
   const activityData = data?.activityData ?? [];
 
   return (

@@ -1,3 +1,29 @@
+class Badge {
+  final String id;
+  final String name;
+  final String description;
+  final String icon;
+  final DateTime earnedAt;
+
+  const Badge({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.icon,
+    required this.earnedAt,
+  });
+
+  factory Badge.fromJson(Map<String, dynamic> json) {
+    return Badge(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      description: json['description'] as String,
+      icon: json['icon'] as String,
+      earnedAt: DateTime.parse(json['earnedAt'] as String),
+    );
+  }
+}
+
 class User {
   final String id;
   final String nickname;
@@ -6,6 +32,7 @@ class User {
   final String? countryCode;
   final bool isBanned;
   final bool pushNotificationsEnabled;
+  final List<Badge> badges;
 
   const User({
     required this.id,
@@ -15,6 +42,7 @@ class User {
     this.countryCode,
     this.isBanned = false,
     this.pushNotificationsEnabled = true,
+    this.badges = const [],
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -26,6 +54,9 @@ class User {
       countryCode: json['countryCode'] as String?,
       isBanned: json['isBanned'] as bool? ?? false,
       pushNotificationsEnabled: json['pushNotificationsEnabled'] as bool? ?? true,
+      badges: (json['badges'] as List? ?? [])
+          .map((e) => Badge.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 }

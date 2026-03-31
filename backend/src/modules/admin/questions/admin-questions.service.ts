@@ -98,8 +98,9 @@ export const adminQuestionsService = {
     const targetMonth = month !== undefined ? month - 1 : now.getMonth();
     const targetYear = year !== undefined ? year : now.getFullYear();
 
-    const startDate = new Date(targetYear, targetMonth, 1);
-    const endDate = new Date(targetYear, targetMonth + 1, 0);
+    // UTC başlangıç ve bitiş tarihlerini ayarla
+    const startDate = new Date(Date.UTC(targetYear, targetMonth, 1));
+    const endDate = new Date(Date.UTC(targetYear, targetMonth + 1, 0, 23, 59, 59, 999));
 
     const assignments = await prisma.dailyQuestionAssignment.findMany({
       where: {

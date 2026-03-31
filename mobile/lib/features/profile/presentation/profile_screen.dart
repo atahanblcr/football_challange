@@ -111,30 +111,54 @@ class ProfileScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               SizedBox(
-                height: 80,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: 5,
-                  separatorBuilder: (_, __) => const SizedBox(width: 16),
-                  itemBuilder: (context, index) {
-                    return Container(
-                      width: 80,
-                      decoration: BoxDecoration(
-                        color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(16),
+                height: 100,
+                child: (userAsync.value?.badges.isEmpty ?? true)
+                    ? Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            'Henüz rozet kazanılmadı. Oynamaya devam et!',
+                            style: AppTextStyles.bodySmall,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      )
+                    : ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: userAsync.value!.badges.length,
+                        separatorBuilder: (_, __) => const SizedBox(width: 16),
+                        itemBuilder: (context, index) {
+                          final badge = userAsync.value!.badges[index];
+                          return Tooltip(
+                            message: badge.description,
+                            child: Container(
+                              width: 80,
+                              decoration: BoxDecoration(
+                                color: AppColors.surface,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(badge.icon, style: const TextStyle(fontSize: 32)),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    badge.name,
+                                    style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
                       ),
-                      child: Center(
-                        child: Text(
-                          '🏅', 
-                          style: TextStyle(
-                            fontSize: 32, 
-                            color: Colors.white.withValues(alpha: 0.3)
-                          )
-                        )
-                      ),
-                    );
-                  },
-                ),
               ).animate().fadeIn(delay: 500.ms),
             ],
           ),

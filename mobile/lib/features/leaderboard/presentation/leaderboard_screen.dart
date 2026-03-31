@@ -16,6 +16,7 @@ class LeaderboardScreen extends ConsumerWidget {
     final leaderboardAsync = ref.watch(leaderboardProvider);
     final scope = ref.watch(leaderboardScopeProvider);
     final period = ref.watch(leaderboardPeriodProvider);
+    final module = ref.watch(leaderboardModuleProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -49,6 +50,23 @@ class LeaderboardScreen extends ConsumerWidget {
                     _buildTab(ref, 'Türkiye', 'tr', scope == 'tr'),
                   ],
                 ),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            // Module Selector
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Row(
+                children: [
+                  _buildModuleChip(ref, 'Hepsi', null, module == null),
+                  _buildModuleChip(ref, 'Oyuncular', 'players', module == 'players'),
+                  _buildModuleChip(ref, 'Kulüpler', 'clubs', module == 'clubs'),
+                  _buildModuleChip(ref, 'Milli Takım', 'nationals', module == 'nationals'),
+                  _buildModuleChip(ref, 'Teknik Direktör', 'managers', module == 'managers'),
+                ],
               ),
             ),
 
@@ -103,6 +121,25 @@ class LeaderboardScreen extends ConsumerWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildModuleChip(WidgetRef ref, String label, String? value, bool isSelected) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: ChoiceChip(
+        label: Text(label),
+        selected: isSelected,
+        onSelected: (_) => ref.read(leaderboardModuleProvider.notifier).state = value,
+        selectedColor: AppColors.primaryLight.withOpacity(0.2),
+        labelStyle: TextStyle(
+          color: isSelected ? AppColors.primaryLight : AppColors.textSecondary,
+          fontSize: 12,
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+        ),
+        backgroundColor: Colors.transparent,
+        side: BorderSide(color: isSelected ? AppColors.primaryLight : AppColors.surfaceVariant),
       ),
     );
   }

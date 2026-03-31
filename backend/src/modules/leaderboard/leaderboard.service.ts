@@ -58,6 +58,25 @@ export class LeaderboardService {
   }
 
   /**
+   * Resolves a period name (weekly, monthly, quarterly) to its current Redis key suffix.
+   */
+  private resolvePeriodKey(period: string): string {
+    const now = new Date();
+    if (period === 'weekly') {
+      return `weekly:${this.getISOWeek(now)}`;
+    }
+    if (period === 'monthly') {
+      const yearMonth = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
+      return `monthly:${yearMonth}`;
+    }
+    if (period === 'quarterly') {
+      const yearQuarter = `${now.getFullYear()}-Q${Math.floor(now.getMonth() / 3) + 1}`;
+      return `quarterly:${yearQuarter}`;
+    }
+    return period; // 'alltime' or specific event keys remain unchanged
+  }
+
+  /**
    * Fetches the top users for a specific leaderboard.
    */
   public async getLeaderboard(params: {
@@ -67,7 +86,8 @@ export class LeaderboardService {
     limit?: number;
   }) {
     const { scope, period, module, limit = 100 } = params;
-    const key = redisKeys.leaderboard(scope, period, module);
+    const resolvedPeriod = this.resolvePeriodKey(period);
+    const key = redisKeys.leaderboard(scope, resolvedPeriod, module);
     
     const topMembers = await redis.zrevrange(key, 0, limit - 1, 'WITHSCORES');
     
@@ -109,19 +129,27 @@ export class LeaderboardService {
     module?: string;
   }) {
     const { scope, period, module } = params;
-    const key = redisKeys.leaderboard(scope, period, module);
+    const resolvedPeriod = this.resolvePeriodKey(period);
+    const key = redisKeys.leaderboard(scope, resolvedPeriod, module);
 
     const score = await redis.zscore(key, userId);
     if (score === null) return null;
 
     const rank = await redis.zrevrank(key, userId);
-    const totalParticipants = await redis.zcard(key);
+    
+    // Fetch user details from DB
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { nickname: true, avatarIndex: true, countryCode: true },
+    });
 
     return {
       userId,
       rank: rank !== null ? rank + 1 : null,
+      nickname: user?.nickname || 'Unknown',
+      avatarIndex: user?.avatarIndex || 0,
+      countryCode: user?.countryCode || 'XX',
       score: parseInt(score),
-      totalParticipants,
     };
   }
 

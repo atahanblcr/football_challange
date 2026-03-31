@@ -107,9 +107,13 @@ export function QuestionCalendar() {
                 </div>
               ) : (
                 days.map((day) => {
+                  // UTC Tarih dizesini oluştur (YYYY-MM-DD)
                   const dayStr = format(day, 'yyyy-MM-dd');
+                  
                   const dayAssignments = (assignments ?? []).filter((a: any) => {
-                    // API'den gelen ISO string'in (2026-03-30T00:00:00.000Z) tarih kısmını al
+                    // API'den gelen ISO string: "2026-03-31T00:00:00.000Z"
+                    // Bunu direkt tarih dizesiyle karşılaştır
+                    if (!a.date) return false;
                     const assignmentDateStr = a.date.split('T')[0];
                     return assignmentDateStr === dayStr;
                   });

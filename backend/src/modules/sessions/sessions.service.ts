@@ -5,6 +5,7 @@ import { ErrorCode } from '../../errors/error-codes';
 import QuestionService from '../questions/questions.service';
 import { ScoringService } from '../scoring/scoring.service';
 import LeaderboardService from '../leaderboard/leaderboard.service';
+import BadgeService from '../users/badge.service';
 
 export class SessionService {
   /**
@@ -169,6 +170,9 @@ export class SessionService {
         isSpecial: question.isSpecial,
         specialEventId: question.specialEventId || undefined,
       });
+
+      // Check for badges
+      await BadgeService.checkAndAwardBadges(userId);
     }
 
     // Mobil uygulama doğrudan sonuçları bekliyor (getSessionResult ile aynı format)
@@ -286,6 +290,9 @@ export class SessionService {
         isSpecial: session.question.isSpecial,
         specialEventId: session.question.specialEventId || undefined,
       });
+
+      // Check for badges after score increase
+      await BadgeService.checkAndAwardBadges(userId);
     }
 
     return this.getSessionResult(userId, sessionId);

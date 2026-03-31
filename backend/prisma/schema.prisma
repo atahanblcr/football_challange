@@ -78,6 +78,8 @@ model User {
   subscriptionTier  SubscriptionTier @default(free)
   premiumExpiresAt  DateTime?
 
+  badges            Json             @default("[]")
+
   isBanned          Boolean          @default(false)
   banSuggested      Boolean          @default(false)
   banSuggestedBy    String?
