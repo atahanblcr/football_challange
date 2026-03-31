@@ -78,10 +78,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ShellRoute(
         builder: (context, state, child) => MainShell(child: child),
         routes: [
-          GoRoute(path: RouteNames.home, builder: (_, __) => const HomeScreen()),
-          GoRoute(path: RouteNames.leaderboard, builder: (_, __) => const LeaderboardScreen()),
-          GoRoute(path: RouteNames.calendar, builder: (_, __) => const CalendarScreen()),
-          GoRoute(path: RouteNames.profile, builder: (_, __) => const ProfileScreen()),
+          GoRoute(name: 'home', path: RouteNames.home, builder: (_, __) => const HomeScreen()),
+          GoRoute(name: 'leaderboard', path: RouteNames.leaderboard, builder: (_, __) => const LeaderboardScreen()),
+          GoRoute(name: 'calendar', path: RouteNames.calendar, builder: (_, __) => const CalendarScreen()),
+          GoRoute(name: 'profile', path: RouteNames.profile, builder: (_, __) => const ProfileScreen()),
         ],
       ),
 

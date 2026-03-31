@@ -32,6 +32,21 @@ class ResultScreen extends ConsumerWidget {
     );
   }
 
+  Widget _buildScoreRow(String label, String value, IconData icon, {Color? color}) {
+    return Row(
+      children: [
+        Icon(icon, size: 16, color: color ?? AppColors.textSecondary),
+        const SizedBox(width: 8),
+        Text(label, style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
+        const Spacer(),
+        Text(value, style: AppTextStyles.bodyMedium.copyWith(
+          fontWeight: FontWeight.bold,
+          color: color ?? Colors.white,
+        )),
+      ],
+    );
+  }
+
   Widget _buildContent(BuildContext context, WidgetRef ref, SessionResult result) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
@@ -46,6 +61,33 @@ class ResultScreen extends ConsumerWidget {
           
           ScoreCounterWidget(score: result.scoreFinal)
               .animate().scale(duration: 600.ms, curve: Curves.easeOutBack),
+          
+          const SizedBox(height: 16),
+          
+          // Score Breakdown
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.surfaceVariant),
+            ),
+            child: Column(
+              children: [
+                _buildScoreRow('Cevap Puanı', '${result.scoreBase}', Icons.check_circle_outline),
+                const SizedBox(height: 8),
+                _buildScoreRow('Süre Bonusu', '+${result.scoreTimeBonus}', Icons.timer_outlined, color: AppColors.warning),
+                const SizedBox(height: 8),
+                _buildScoreRow('Zorluk Çarpanı', 'x${(result.scoreDifficulty / (result.scoreBase + result.scoreTimeBonus)).toStringAsFixed(2)}', Icons.bolt, color: AppColors.primaryLight),
+                if (result.adMultiplied) ...[
+                  const SizedBox(height: 8),
+                  const Divider(color: Colors.white10),
+                  const SizedBox(height: 8),
+                  _buildScoreRow('Reklam Bonusu', 'x1.50', Icons.play_circle_outline, color: AppColors.correct),
+                ],
+              ],
+            ),
+          ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.1, end: 0),
           
           const SizedBox(height: 32),
           
@@ -84,7 +126,7 @@ class ResultScreen extends ConsumerWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: () => context.pushNamed(RouteNames.leaderboard),
+                  onPressed: () => context.go(RouteNames.leaderboard),
                   icon: const Icon(Icons.leaderboard),
                   label: const Text('Sıralama'),
                   style: ElevatedButton.styleFrom(
