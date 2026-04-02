@@ -4,6 +4,8 @@ class AppConfig {
   final bool forceUpdate;
   final ActiveEvent? activeEvent;
   final ScoringConfig? scoring;
+  final DateTime serverTime;
+  final DateTime nextResetAt;
 
   const AppConfig({
     required this.minimumVersion,
@@ -11,6 +13,8 @@ class AppConfig {
     required this.forceUpdate,
     this.activeEvent,
     this.scoring,
+    required this.serverTime,
+    required this.nextResetAt,
   });
 
   factory AppConfig.fromJson(Map<String, dynamic> json) {
@@ -24,6 +28,8 @@ class AppConfig {
       scoring: json['scoring'] != null
           ? ScoringConfig.fromJson(json['scoring'])
           : null,
+      serverTime: DateTime.parse(json['server_time'] as String),
+      nextResetAt: DateTime.parse(json['next_reset_at'] as String),
     );
   }
 }

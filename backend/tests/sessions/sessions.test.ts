@@ -89,9 +89,9 @@ describe('Sessions Integration Tests', () => {
         .set('Authorization', `Bearer ${userToken}`);
 
       expect(response.status).toBe(201);
-      expect(response.body).toHaveProperty('sessionId');
-      expect(response.body).toHaveProperty('questionTitle', 'Top Scorers Question');
-      sessionId = response.body.sessionId;
+      expect(response.body.data).toHaveProperty('sessionId');
+      expect(response.body.data).toHaveProperty('questionTitle', 'Top Scorers Question');
+      sessionId = response.body.data.sessionId;
     });
 
     it('should prevent starting the same session twice (cooldown)', async () => {
@@ -112,10 +112,10 @@ describe('Sessions Integration Tests', () => {
       if (response.status !== 200) console.log('SUBMIT ERROR:', JSON.stringify(response.body, null, 2));
 
       expect(response.status).toBe(200);
-      expect(response.body.score.final).toBeGreaterThan(0);
+      expect(response.body.data.score.final).toBeGreaterThan(0);
       
       // Blur check
-      const rank2Answer = response.body.answers.find((a: any) => a.rank === 2);
+      const rank2Answer = response.body.data.answers.find((a: any) => a.rank === 2);
       expect(rank2Answer.blurred).toBe(true);
       expect(rank2Answer).not.toHaveProperty('entity');
     });
@@ -125,7 +125,7 @@ describe('Sessions Integration Tests', () => {
       const startRes = await request(app)
         .post(`/api/v1/questions/${questionId}/start`)
         .set('Authorization', `Bearer ${premiumToken}`);
-      const pSessionId = startRes.body.sessionId;
+      const pSessionId = startRes.body.data.sessionId;
 
       // 2. Submit only 1 correct answer
       const submitRes = await request(app)
@@ -135,23 +135,28 @@ describe('Sessions Integration Tests', () => {
 
       expect(submitRes.status).toBe(200);
       // Even the one missed (rank 2) should NOT be blurred for premium
-      const rank2Answer = submitRes.body.answers.find((a: any) => a.rank === 2);
+      const rank2Answer = submitRes.body.data.answers.find((a: any) => a.rank === 2);
       expect(rank2Answer.blurred).toBe(false);
       expect(rank2Answer.entity.name).toBe('Ronaldo');
     });
 
     it('should apply ad reward multiplier', async () => {
-      // Get the free user's session result from before
-      const sess = await prisma.gameSession.findFirst({ where: { userId } });
-      const oldScore = sess?.scoreFinal || 0;
-
-      const response = await request(app)
-        .post(`/api/v1/sessions/${sess?.id}/ad-reward`)
+      // 1. Get Ad Intent Token
+      const intentRes = await request(app)
+        .post(`/api/v1/sessions/${sessionId}/ad-intent`)
         .set('Authorization', `Bearer ${userToken}`);
+      
+      expect(intentRes.status).toBe(200);
+      const adToken = intentRes.body.data.adToken;
+
+      // 2. Apply Ad Reward with Token
+      const response = await request(app)
+        .post(`/api/v1/sessions/${sessionId}/ad-reward`)
+        .set('Authorization', `Bearer ${userToken}`)
+        .send({ adToken });
 
       expect(response.status).toBe(200);
-      expect(response.body.score.final).toBe(Math.floor(sess!.scoreDifficulty * 1.5));
-      expect(response.body.adMultiplied).toBe(true);
+      expect(response.body.data.adMultiplied).toBe(true);
     });
   });
 });

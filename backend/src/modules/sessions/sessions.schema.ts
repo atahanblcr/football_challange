@@ -19,6 +19,9 @@ export const submitSessionSchema = z.object({
 export const adRewardSchema = z.object({
   params: z.object({
     id: z.string(),
+  }),
+  body: z.object({
+    adToken: z.string().min(1, 'Reklam tokenı gereklidir'),
   })
 });
 

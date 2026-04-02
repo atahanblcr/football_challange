@@ -11,6 +11,7 @@ import '../../auth/data/auth_repository.dart';
 import 'home_provider.dart';
 import 'widgets/module_card_widget.dart';
 import 'widgets/special_event_banner_widget.dart';
+import 'widgets/reset_countdown_widget.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -57,9 +58,15 @@ class HomeScreen extends ConsumerWidget {
                             builder: (context, ref, _) {
                               return FutureBuilder<String>(
                                 future: ref.read(authRepositoryProvider).getMe().then((u) => u.nickname),
-                                builder: (context, snapshot) => Text(
-                                  snapshot.data ?? '...',
-                                  style: AppTextStyles.titleMedium,
+                                builder: (context, snapshot) => Row(
+                                  children: [
+                                    Text(
+                                      snapshot.data ?? '...',
+                                      style: AppTextStyles.titleMedium,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    const ResetCountdownWidget(),
+                                  ],
                                 ),
                               );
                             },

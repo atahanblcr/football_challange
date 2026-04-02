@@ -14,10 +14,20 @@ class ResultRepository {
     return SessionResult.fromJson(response.data['data']);
   }
 
-  Future<void> claimAdReward({
+  Future<String> getAdIntent(String sessionId) async {
+    final response = await _dio.post(ApiEndpoints.adIntent(sessionId));
+    return response.data['data']['adToken'];
+  }
+
+  Future<SessionResult> claimAdReward({
     required String sessionId,
+    required String adToken,
   }) async {
-    await _dio.post(ApiEndpoints.adReward(sessionId));
+    final response = await _dio.post(
+      ApiEndpoints.adReward(sessionId),
+      data: {'adToken': adToken},
+    );
+    return SessionResult.fromJson(response.data['data']);
   }
 }
 

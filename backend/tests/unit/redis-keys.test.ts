@@ -4,7 +4,7 @@ import { redisKeys } from '../../src/utils/redis-keys.util';
 describe('RedisKeys', () => {
   it('should generate leaderboard keys correctly', () => {
     expect(redisKeys.leaderboard('global', 'weekly')).toBe('leaderboard:global:weekly');
-    expect(redisKeys.leaderboard('tr', 'alltime', 'players')).toBe('leaderboard:tr:alltime:players');
+    expect(redisKeys.leaderboard('tr', 'alltime', 'players')).toBe('leaderboard:module:players:tr:alltime');
   });
 
   it('should generate autocomplete keys based on first 3 chars', () => {

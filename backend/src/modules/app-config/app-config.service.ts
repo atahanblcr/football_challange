@@ -28,11 +28,27 @@ export const appConfigService = {
       select: { id: true, name: true, endsAt: true }
     });
 
+    // 3. Zaman bilgilerini hesapla (UTC+3 reset)
+    const now = new Date();
+    const server_time = now.toISOString();
+
+    // Reset her gün 00:00 UTC+3 (Istanbul)
+    const istanbulOffset = 3;
+    const nextReset = new Date(now);
+    nextReset.setUTCHours(24 - istanbulOffset, 0, 0, 0); // Bu bizi Istanbul 00:00'a götürür
+    
+    // Eğer hesaplanan reset geçmişteyse (bugün resetlendi), yarına at
+    if (nextReset <= now) {
+      nextReset.setUTCDate(nextReset.getUTCDate() + 1);
+    }
+
     return {
       minimum_version: config.minimum_version,
       latest_version: config.latest_version,
       force_update: config.force_update,
       active_event: activeEvent || null,
+      server_time,
+      next_reset_at: nextReset.toISOString(),
       scoring: {
         adMultiplier: config.adMultiplier,
         difficultyMediumMultiplier: config.difficultyMediumMultiplier,

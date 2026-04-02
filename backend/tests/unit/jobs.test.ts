@@ -8,17 +8,17 @@ describe('Daily Question Selector Logic Tests (90-day Cooldown)', () => {
   const testAdminId = 'job_test_admin';
 
   beforeAll(async () => {
-    // Selective cleanup: only delete what this test created or related to test module
+    // Complete cleanup for test module to ensure isolation
     await prisma.gameSession.deleteMany({
-      where: { question: { createdBy: testAdminId } }
+      where: { question: { module: testModule } }
     });
     await prisma.dailyQuestionAssignment.deleteMany({
-      where: { question: { createdBy: testAdminId } }
+      where: { module: testModule }
     });
     await prisma.questionAnswer.deleteMany({
-      where: { question: { createdBy: testAdminId } }
+      where: { question: { module: testModule } }
     });
-    await prisma.question.deleteMany({ where: { createdBy: testAdminId } });
+    await prisma.question.deleteMany({ where: { module: testModule } });
   });
 
   afterAll(async () => {

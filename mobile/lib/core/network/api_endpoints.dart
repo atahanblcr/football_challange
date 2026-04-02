@@ -24,6 +24,7 @@ class ApiEndpoints {
   // Sessions
   static String submitSession(String id)   => '/sessions/$id/submit';
   static String sessionResult(String id)   => '/sessions/$id/result';
+  static String adIntent(String id)        => '/sessions/$id/ad-intent';
   static String adReward(String id)        => '/sessions/$id/ad-reward';
 
   // Search

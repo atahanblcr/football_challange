@@ -52,14 +52,30 @@ export class SessionController {
   }
 
   /**
+   * POST /api/v1/sessions/:id/ad-intent
+   */
+  public async generateAdIntent(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id: sessionId } = req.params;
+      const userId = (req as any).user!.id;
+
+      const result = await SessionService.generateAdIntent(userId, sessionId);
+      res.json({ data: result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
    * POST /api/v1/sessions/:id/ad-reward
    */
   public async applyAdReward(req: Request, res: Response, next: NextFunction) {
     try {
       const { id: sessionId } = req.params;
+      const { adToken } = req.body;
       const userId = (req as any).user!.id;
 
-      const result = await SessionService.applyAdReward(userId, sessionId);
+      const result = await SessionService.applyAdReward(userId, sessionId, adToken);
       res.json({ data: result });
     } catch (error) {
       next(error);

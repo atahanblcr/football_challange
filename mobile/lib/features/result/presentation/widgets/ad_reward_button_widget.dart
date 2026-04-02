@@ -26,59 +26,69 @@ class _AdRewardButtonWidgetState extends ConsumerState<AdRewardButtonWidget> {
     super.dispose();
   }
 
-  void _showAdAndClaim() {
+  void _showAdAndClaim() async {
     setState(() => _isLoading = true);
-    
-    AdService.loadRewardedAd(
-      onAdLoaded: (ad) {
-        _rewardedAd = ad;
-        _rewardedAd!.fullScreenContentCallback = FullScreenContentCallback(
-          onAdDismissedFullScreenContent: (ad) {
-            ad.dispose();
-            _rewardedAd = null;
-            if (mounted) setState(() => _isLoading = false);
-          },
-          onAdFailedToShowFullScreenContent: (ad, error) {
-            ad.dispose();
-            _rewardedAd = null;
-            if (mounted) setState(() => _isLoading = false);
-          },
-        );
 
-        _rewardedAd!.show(
-          onUserEarnedReward: (AdWithoutView ad, RewardItem reward) async {
-            // Reward earned!
-            try {
-              // Note: Google's SSV reward verification happens server-to-server.
-              // Here we just notify the backend that the user finished the ad.
-              // For extra security, Google's SSV callback can be used on the backend.
-              
-              await ref.read(resultRepositoryProvider).claimAdReward(
-                sessionId: widget.sessionId,
-              );
-
-              if (mounted) {
-                ref.invalidate(sessionResultProvider(widget.sessionId));
-              }
-            } catch (e) {
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Hata: ${e.toString()}'))
-                );
-              }
-            }
-          },
-        );
-      },
-      onAdFailedToLoad: (error) {
-        if (mounted) {
-          setState(() => _isLoading = false);
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Reklam yüklenemedi. Lütfen tekrar deneyin.'))
+    try {
+      // 1. Get Ad Intent Token first
+      final adToken = await ref.read(resultRepositoryProvider).getAdIntent(widget.sessionId);
+      
+      // 2. Load and Show Ad
+      AdService.loadRewardedAd(
+        onAdLoaded: (ad) {
+          _rewardedAd = ad;
+          _rewardedAd!.fullScreenContentCallback = FullScreenContentCallback(
+            onAdDismissedFullScreenContent: (ad) {
+              ad.dispose();
+              _rewardedAd = null;
+              if (mounted) setState(() => _isLoading = false);
+            },
+            onAdFailedToShowFullScreenContent: (ad, error) {
+              ad.dispose();
+              _rewardedAd = null;
+              if (mounted) setState(() => _isLoading = false);
+            },
           );
-        }
-      },
-    );
+
+          _rewardedAd!.show(
+            onUserEarnedReward: (AdWithoutView ad, RewardItem reward) async {
+              try {
+                // 3. Claim reward with token
+                await ref.read(resultRepositoryProvider).claimAdReward(
+                  sessionId: widget.sessionId,
+                  adToken: adToken,
+                );
+
+                if (mounted) {
+                  ref.invalidate(sessionResultProvider(widget.sessionId));
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Hata: ${e.toString()}'))
+                  );
+                }
+              }
+            },
+          );
+        },
+        onAdFailedToLoad: (error) {
+          if (mounted) {
+            setState(() => _isLoading = false);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Reklam yüklenemedi. Lütfen tekrar deneyin.'))
+            );
+          }
+        },
+      );
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Hata: ${e.toString()}'))
+        );
+      }
+    }
   }
 
   @override

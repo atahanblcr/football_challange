@@ -72,8 +72,6 @@ model User {
   timezone          String           @default("Europe/Istanbul") @db.VarChar(50)
   fcmToken          String?          @db.VarChar(255)
   pushNotificationsEnabled Boolean      @default(true)
-  dailyAdsWatched   Int              @default(0)
-  dailyQuestionsSolved Int           @default(0)
 
   subscriptionTier  SubscriptionTier @default(free)
   premiumExpiresAt  DateTime?
@@ -92,6 +90,7 @@ model User {
 
   gameSessions      GameSession[]
   pointHistory      PointHistory[]
+  dailyLimits       DailyUserLimit[]
 
   @@index([email])
   @@index([nickname])
@@ -99,6 +98,21 @@ model User {
   @@index([subscriptionTier])
   @@index([isBanned])
   @@index([lastActiveAt])
+}
+
+// GÜNLÜK KULLANICI LİMİTLERİ (Modül bazlı takip)
+model DailyUserLimit {
+  id           String         @id @default(cuid())
+  userId       String
+  date         DateTime       @db.Date
+  module       QuestionModule
+  normalSolved Boolean        @default(false)
+  adSolved     Boolean        @default(false)
+
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date, module])
+  @@index([userId, date])
 }
 
 // ENTİTY
@@ -213,6 +227,9 @@ model GameSession {
   suspiciousReason String?
 
   cooldownUntil   DateTime?
+
+  adToken         String?  @db.VarChar(255)
+  adTokenExpiresAt DateTime?
 
   createdAt       DateTime   @default(now())
 

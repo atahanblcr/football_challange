@@ -77,6 +77,22 @@
 - [ ] **BEKLEMEDE:** Firebase Service Account JSON dosyasının `backend/` klasörüne eklenmesi ve `.env` güncellemesi.
 - [ ] **BEKLEMEDE:** `mobile/lib/core/services/ad_service.dart` dosyasındaki test ID'lerin gerçek ID'ler ile değiştirilmesi.
 
+## [2026-04-03] — MANTIK HATALARI VE GÜVENLİK İYİLEŞTİRMELERİ (TAMAMLANDI)
+
+### 4.1 Backend Mantık ve Güvenlik (TAMAMLANDI)
+- [x] `DailyUserLimit` tablosu eklendi, günlük haklar modül bazlı (1 normal + 1 reklamlı) ayrıldı.
+- [x] Yarış Durumu (Race Condition) koruması: `submitSession` atomik hale getirildi.
+- [x] Reklam Ödülü Güvenliği: `ad-intent` token mekanizması (handshake) kuruldu.
+- [x] Sunucu Saati Senkronizasyonu: `next_reset_at` (UTC+3) API'ye eklendi.
+- [x] Backend Concurrency (Eş Zamanlılık) Testi başarıyla tamamlandı.
+- [x] Tüm backend testleri (94 test) %100 başarıyla geçti.
+
+### 4.2 Flutter Mobil Güncellemeler (TAMAMLANDI)
+- [x] `ResetCountdownWidget` ile sunucu tabanlı geri sayım ekranı eklendi.
+- [x] Reklam akışı `ad-intent` doğrulamasıyla güncellendi.
+- [x] `Golden Test` altyapısı (`golden_toolkit`) kuruldu ve ResultScreen testi yazıldı.
+- [x] `Patrol` (E2E) altyapısı kuruldu ve temel uygulama testi eklendi.
+
 ## PROJE DURUMU: %100 TAMAMLANDI (Lansmana Hazır)
 
 ### Sıradaki Adım

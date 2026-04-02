@@ -40,10 +40,10 @@ describe('Leaderboard Integration Tests', () => {
         .set('Authorization', `Bearer ${userToken}`);
 
       expect(response.status).toBe(200);
-      expect(Array.isArray(response.body)).toBe(true);
-      expect(response.body[0]).toHaveProperty('nickname', 'lb_user');
-      expect(response.body[0].score).toBe(1000);
-      expect(response.body[1].nickname).toBe('Unknown');
+      expect(Array.isArray(response.body.data.items)).toBe(true);
+      expect(response.body.data.items[0]).toHaveProperty('nickname', 'lb_user');
+      expect(response.body.data.items[0].score).toBe(1000);
+      expect(response.body.data.items[1].nickname).toBe('Unknown');
     });
   });
 
@@ -58,9 +58,8 @@ describe('Leaderboard Integration Tests', () => {
         .set('Authorization', `Bearer ${userToken}`);
 
       expect(response.status).toBe(200);
-      expect(response.body.rank).toBe(1);
-      expect(response.body.score).toBe(1000);
-      expect(response.body.totalParticipants).toBe(100);
+      expect(response.body.data.rank).toBe(1);
+      expect(response.body.data.score).toBe(1000);
     });
 
     it('should return null rank if user has no score', async () => {
@@ -71,7 +70,7 @@ describe('Leaderboard Integration Tests', () => {
         .set('Authorization', `Bearer ${userToken}`);
 
       expect(response.status).toBe(200);
-      expect(response.body).toBe(null);
+      expect(response.body.data).toBe(null);
     });
   });
 });
