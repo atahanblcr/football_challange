@@ -59,6 +59,12 @@ export function QuestionEdit() {
   const handleSubmit = async (status: string) => {
     if (!form.title) return toast.error('Lütfen bir başlık girin.');
     if (answers.length < 1) return toast.error('En az bir cevap eklemelisiniz.');
+    
+    // Check for empty statValues
+    const hasEmptyStat = answers.some(a => !a.statValue.trim());
+    if (hasEmptyStat) {
+      return toast.error('Tüm cevaplar için bir stat değeri girmelisiniz.');
+    }
 
     const payload = {
       ...form,

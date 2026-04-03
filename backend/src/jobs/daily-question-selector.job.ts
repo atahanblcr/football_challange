@@ -19,70 +19,89 @@ export const dailyQuestionSelectorJob = () => {
 export const runDailyQuestionSelector = async () => {
   logger.info('[Job] Daily question selector started.');
   
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
   const modules: QuestionModule[] = ['players', 'clubs', 'nationals', 'managers'];
+  const DAYS_TO_PREFILL = 7;
 
   try {
-    for (const module of modules) {
-      // 1. Zaten seçilmiş mi kontrol et
-      const existing = await prisma.dailyQuestionAssignment.findUnique({
-        where: {
-          date_module_isExtra: {
-            date: today,
-            module: module,
-            isExtra: false,
+    // Önümüzdeki 7 günü tara ve boş günlere atama yap
+    for (let i = 0; i < DAYS_TO_PREFILL; i++) {
+      const targetDate = new Date();
+      targetDate.setDate(targetDate.getDate() + i);
+      targetDate.setHours(0, 0, 0, 0);
+
+      const datePart = targetDate.toISOString().split('T')[0];
+      const [year, month, day] = datePart.split('-').map(Number);
+      const scheduledDate = new Date(Date.UTC(year, month - 1, day));
+
+      for (const module of modules) {
+        // 1. Zaten seçilmiş mi kontrol et
+        const existing = await prisma.dailyQuestionAssignment.findUnique({
+          where: {
+            date_module_isExtra: {
+              date: scheduledDate,
+              module: module,
+              isExtra: false,
+            }
           }
+        });
+
+        if (existing) {
+          logger.info(`[Job] Module ${module} already has a question for ${datePart}.`);
+          continue;
         }
-      });
 
-      if (existing) {
-        logger.info(`[Job] Module ${module} already has a question for today.`);
-        continue;
-      }
+        // 2. Havuzdan uygun bir soru seç
+        // Şartlar: Modül doğru, statüsü ACTIVE, isSpecial FALSE, 90 günlük cooldown geçmemiş
+        const ninetyDaysAgo = new Date();
+        ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
 
-      // 2. Havuzdan uygun bir soru seç
-      // Şartlar: Modül doğru, statüsü ACTIVE, isSpecial FALSE, 90 günlük cooldown geçmemiş
-      const ninetyDaysAgo = new Date();
-      ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+        // Not: Şu anki ve gelecekteki atamaları da hariç tutalım ki aynı hafta içinde aynı soru gelmesin
+        const currentlyAssignedIds = await prisma.dailyQuestionAssignment.findMany({
+          where: {
+            date: { gte: ninetyDaysAgo }
+          },
+          select: { questionId: true }
+        });
+        const excludedIds = currentlyAssignedIds.map(a => a.questionId);
 
-      const pool = await prisma.question.findMany({
-        where: {
-          module: module,
-          status: QuestionStatus.active,
-          isSpecial: false,
-          OR: [
-            { lastShownAt: null },
-            { lastShownAt: { lt: ninetyDaysAgo } }
-          ]
-        },
-        select: { id: true }
-      });
-
-      if (pool.length === 0) {
-        logger.warn(`[Job] No eligible questions in pool for module: ${module}`);
-        continue;
-      }
-
-      const randomQuestion = pool[Math.floor(Math.random() * pool.length)];
-
-      // 3. Atamayı yap
-      await prisma.$transaction([
-        prisma.dailyQuestionAssignment.create({
-          data: {
-            date: today,
+        const pool = await prisma.question.findMany({
+          where: {
             module: module,
-            questionId: randomQuestion.id,
-          }
-        }),
-        prisma.question.update({
-          where: { id: randomQuestion.id },
-          data: { lastShownAt: today }
-        })
-      ]);
+            status: QuestionStatus.active,
+            isSpecial: false,
+            id: { notIn: excludedIds },
+            OR: [
+              { lastShownAt: null },
+              { lastShownAt: { lt: ninetyDaysAgo } }
+            ]
+          },
+          select: { id: true }
+        });
 
-      logger.info(`[Job] Assigned question ${randomQuestion.id} to module ${module} for ${today.toISOString().split('T')[0]}`);
+        if (pool.length === 0) {
+          logger.warn(`[Job] No eligible questions in pool for module: ${module} on ${datePart}`);
+          continue;
+        }
+
+        const randomQuestion = pool[Math.floor(Math.random() * pool.length)];
+
+        // 3. Atamayı yap
+        await prisma.$transaction([
+          prisma.dailyQuestionAssignment.create({
+            data: {
+              date: scheduledDate,
+              module: module,
+              questionId: randomQuestion.id,
+            }
+          }),
+          prisma.question.update({
+            where: { id: randomQuestion.id },
+            data: { lastShownAt: scheduledDate }
+          })
+        ]);
+
+        logger.info(`[Job] Assigned question ${randomQuestion.id} to module ${module} for ${datePart}`);
+      }
     }
     
     logger.info('[Job] Daily question selector completed successfully.');

@@ -73,11 +73,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
         ),
         child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(32.0),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 48.0),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const Spacer(),
+                const SizedBox(height: 40),
                 const Text(
                   '⚽',
                   style: TextStyle(fontSize: 80),
@@ -99,7 +100,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   textAlign: TextAlign.center,
                 ).animate().fadeIn(delay: 400.ms),
                 
-                const Spacer(),
+                const SizedBox(height: 60),
                 
                 if (!_showEmailForm) ...[
                   // Social Login Buttons
@@ -154,6 +155,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         controller: _emailController,
                         decoration: const InputDecoration(hintText: 'E-posta'),
                         style: const TextStyle(color: Colors.white),
+                        keyboardType: TextInputType.emailAddress,
                       ),
                       const SizedBox(height: 16),
                       TextField(
@@ -186,7 +188,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ).animate().fadeIn(),
                 ],
                 
-                const SizedBox(height: 16),
+                const SizedBox(height: 40),
                 
                 const Text(
                   'Giriş yaparak kullanım koşullarını kabul etmiş olursunuz.',

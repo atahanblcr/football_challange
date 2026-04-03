@@ -52,20 +52,22 @@ export function SortableAnswerRow({ answer, rank, onUpdate, onRemove }: Props) {
 
       {/* Stat değeri */}
       <input
-        className="bg-background text-sm px-2 py-1.5 rounded border border-surface
-                   focus:border-primary outline-none text-white w-full"
+        className={`bg-background text-sm px-2 py-1.5 rounded border outline-none text-white w-full transition-colors ${
+          !answer.statValue ? 'border-red-500/50 focus:border-red-500' : 'border-surface focus:border-primary'
+        }`}
         value={answer.statValue}
         onChange={e => onUpdate({ ...answer, statValue: e.target.value })}
-        placeholder="192"
+        placeholder="Değer (örn: 192)"
       />
 
       {/* Görünen metin */}
       <input
-        className="bg-background text-sm px-2 py-1.5 rounded border border-surface
-                   focus:border-primary outline-none text-white w-full"
+        className={`bg-background text-sm px-2 py-1.5 rounded border outline-none text-white w-full transition-colors ${
+          !answer.statDisplay ? 'border-red-500/50 focus:border-red-500' : 'border-surface focus:border-primary'
+        }`}
         value={answer.statDisplay}
         onChange={e => onUpdate({ ...answer, statDisplay: e.target.value })}
-        placeholder="192 asist"
+        placeholder="Etiket (örn: 192 Asist)"
       />
 
       {/* Sil */}

@@ -58,7 +58,7 @@ class ModuleCardWidget extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              isCompleted ? 'Puan: ${question.score}' : '${question.answerCount} Soru • ${question.timeLimit}s',
+              isCompleted ? 'Puan: ${question.score}' : '${question.answerCount} Cevap • ${question.timeLimit}s',
               style: AppTextStyles.bodySmall,
             ),
           ],

@@ -1,8 +1,20 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
+
 class ApiEndpoints {
-  static const String baseUrl = String.fromEnvironment(
-    'API_BASE_URL',
-    defaultValue: 'http://localhost:3000/api/v1',
-  );
+  static String get baseUrl {
+    const fromEnv = String.fromEnvironment('API_BASE_URL');
+    if (fromEnv.isNotEmpty) return fromEnv;
+
+    // Local development defaults
+    if (kIsWeb) {
+      return 'http://localhost:3000/api/v1';
+    } else {
+      // Use your MacBook's local IP for physical devices and emulators
+      // 10.0.2.2 is ONLY for emulators, 192.168.1.103 works for both if on same WiFi
+      return 'http://192.168.1.103:3000/api/v1';
+    }
+  }
 
   // Auth
   static const String googleLogin    = '/auth/google';

@@ -2,7 +2,7 @@
   "project_info": {
     "project_number": "153107720287",
     "project_id": "football-challenge-a14ac",
-    "storage_bucket": "football-challenge-a14ac.firebasestorage.app"
+    "storage_bucket": "football-challenge-a14ac.appspot.com"
   },
   "client": [
     {
@@ -12,29 +12,9 @@
           "package_name": "com.atahanblcr.football_challenge"
         }
       },
-      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBRANKfL3tR6bxcN6DYCCq92VUOSt1D8cQ"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:153107720287:android:bd84ff9a0d2036598253ea",
-        "android_client_info": {
-          "package_name": "com.yourcompany.football_challenge"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyBRANKfL3tR6bxcN6DYCCq92VUOSt1D8cQ"
+          "current_key": "dummy_key"
         }
       ],
       "services": {
