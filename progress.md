@@ -1,29 +1,29 @@
 # PROJE İLERLEME RAPORU (PROGRESS)
 
-## [2026-04-03] — ANDROID STABİLİZASYON VE ALTYAPI MODERNİZASYONU (TAMAMLANDI)
+## [2026-04-06] — ÖZEL ETKİNLİK ENTEGRASYONU VE SİSTEM STABİLİZASYONU (TAMAMLANDI)
 
-### 5.1 Android Build ve Kaynak Onarımı (TAMAMLANDI)
-- [x] Android build altyapısı `.kts` formatına modernize edildi (Gradle 8.12, AGP 8.9.1).
-- [x] Eksik `MainActivity.kt` ve paket yapısı onarıldı.
-- [x] Bozulmuş/Eksik Android kaynakları (`res/` klasörü) standart Flutter şablonuna göre geri yüklendi.
-- [x] Android 16 (API 36) uyumluluğu için `compileSdk` ve `targetSdk` güncellendi.
-- [x] Firebase entegrasyonu için dummy `google-services.json` sağlandı.
-- [x] Manifest merger hataları (`tools:replace`) giderildi.
+### 6.1 Özel Etkinlik Mimari İyileştirmeleri (TAMAMLANDI)
+- [x] `DailyQuestionAssignment` modeline `isSpecial` flag'i eklendi (Prisma migration uygulandı).
+- [x] Backend `upsert` mantığı güncellenerek normal ve özel soruların aynı gün çakışması engellendi.
+- [x] `getDailyQuestions` API'si sadece `isActive: true` olan özel etkinlik sorularını dönecek şekilde filtrelendi.
 
-### 5.2 Ağ ve Cihaz Bağlantı Çözümleri (TAMAMLANDI)
-- [x] Fiziksel cihazların backend'e erişebilmesi için `ApiEndpoints` yerel IP (`192.168.1.103`) kullanacak şekilde güncellendi.
-- [x] Hem Android Emülatör hem de gerçek telefonlarda WiFi üzerinden bağlantı stabilize edildi.
+### 6.2 Admin Panel Geliştirmeleri (TAMAMLANDI)
+- [x] Soru oluşturma ve düzenleme formlarına dinamik Etkinlik Seçim alanı eklendi.
+- [x] Soru Takvimi (Calendar) özel soruları görsel olarak (Altın/Sarı) vurgulayacak şekilde modernize edildi.
+- [x] Admin panel `package.json` dosyasına `test` script'i eklendi ve tüm testler doğrulandı.
 
-### 5.3 Backend ve Admin Panel İyileştirmeleri (TAMAMLANDI)
-- [x] `dailyQuestionSelectorJob` önümüzdeki 7 günü otomatik dolduracak şekilde geliştirildi.
-- [x] Admin panelinde soru kaydetme sırasındaki "Geçersiz veri" (400) hataları için görsel doğrulama (kırmızı çerçeve) eklendi.
-- [x] `answerCount` (Cevap Sayısı) otomatik hesaplama ve mobilde gösterim mantığı doğrulandı.
+### 6.3 Mobil Uygulama Entegrasyonu (TAMAMLANDI)
+- [x] `ApiEndpoints` simülatör/emülatör/fiziksel cihaz ayrımını otomatik yapacak şekilde güncellendi.
+- [x] `SpecialEventBannerWidget` fonksiyonel hale getirildi; tıklandığında soru detayına gidiyor ve tamamlanmışsa buton metni değişiyor.
+- [x] Ana ekran selamlaması "Merhaba" olarak revize edildi.
 
-### 5.4 Mobil UI/UX Düzeltmeleri (TAMAMLANDI)
-- [x] Ana ekrandaki "Soru" ifadesi, içeriği yansıtacak şekilde "Cevap" olarak değiştirildi.
-- [x] Klavye açıldığında oluşan Bottom Overflow (Taşma) hataları `SingleChildScrollView` ile tüm auth ekranlarında giderildi.
+### 6.4 Test ve Stabilite (TAMAMLANDI)
+- [x] Backend entegrasyon test suitinin (94 test) tamamı pass edildi.
+- [x] Admin panel testleri (8 test) pass edildi.
+- [x] EADDRINUSE port çakışması sorunu giderildi.
 
-## PROJE DURUMU: %100 ANDROID STABİLİZE EDİLDİ
+## PROJE DURUMU: %100 ÖZEL ETKİNLİK İŞ AKIŞI TAMAMLANDI
 
 ### Sıradaki Adım
-- [ ] Gerçek AdMob ID'lerin yerleştirilmesi ve mağaza başvurusu öncesi son testler.
+- [ ] Admin panel istatistiklerinin (Dashboard) gerçek verilerle test edilmesi.
+- [ ] Uygulama genelinde hata yönetimi (Error Handling) iyileştirmeleri.

@@ -1,25 +1,25 @@
 # AKTİF ÇALIŞMA BAĞLAMI (ACTIVE CONTEXT)
 
-**Şu Anki Faz:** Android Stabilizasyon ve Canlı Ortam Hazırlığı
-**Durum:** Tamamlandı
+**Şu Anki Faz:** Özel Etkinlik İş Akışı ve Sistem Entegrasyonu
+**Durum:** Tamamlandı (Regresyon Testleri Geçildi)
 
 ## Son Yapılan İşlemler
-- **Android Build Modernizasyonu:**
-    - Gradle dosyaları `.kts` formatına (Kotlin DSL) taşındı.
-    - Gradle 8.12, AGP 8.9.1 ve Java 17 uyumluluğu sağlandı (Android 16 / SDK 36 desteği).
-    - Eksik Android kaynakları (`strings.xml`, `styles.xml`, `mipmap` ikonları, `MainActivity.kt`) geri yüklendi.
-    - Manifest çakışmaları (`AD_SERVICES_CONFIG`) `tools:replace` ile çözüldü.
-- **Ağ ve Bağlantı Çözümleri:**
-    - `ApiEndpoints.dart` güncellenerek MacBook'un yerel IP'si (`192.168.1.103`) üzerinden hem emülatör hem de fiziksel cihaz bağlantısı sağlandı.
-- **Backend Otomasyonu:**
-    - `dailyQuestionSelectorJob` geliştirilerek önümüzdeki 7 gün için otomatik soru atama özelliği eklendi ve manuel tetiklendi.
-- **Admin Panel & UX:**
-    - Soru düzenleme ekranındaki `400 Bad Request` hatası (boş stat değerleri) frontend doğrulaması ve kırmızı çerçeve geri bildirimiyle çözüldü.
-- **Mobil UI/UX:**
-    - Modül kartlarındaki terminoloji hatası ("Soru" -> "Cevap") düzeltildi.
-    - `LoginScreen` ve `RegisterScreen` ekranlarındaki klavye açılınca oluşan taşma (overflow) sorunları `SingleChildScrollView` ile giderildi.
+- **Özel Etkinlik (Special Event) İş Akışı:**
+    - `DailyQuestionAssignment` tablosuna `isSpecial` alanı eklendi ve unique kısıtlaması güncellendi. Artık aynı gün hem normal hem özel soru çakışmadan atanabiliyor.
+    - Admin panelinde soru oluşturma/düzenleme ekranlarına **"Bağlı Etkinlik"** seçim dropdown'ı eklendi.
+    - Soru Takvimi (Calendar) güncellendi; özel etkinlik soruları altın rengi ve tooltip ile ayırt edilebilir hale getirildi.
+- **Mobil Entegrasyon ve Bağlantı:**
+    - `api_endpoints.dart` güncellenerek simülatör (localhost), emülatör (10.0.2.2) ve fiziksel cihaz (PC IP) için dinamik geçiş sağlandı.
+    - Ana ekrandaki "Dünya Kupası" banner'ı fonksiyonel hale getirildi. "Hemen Oyna" butonu o günün özel sorusuna yönlendiriyor.
+    - "Günaydın" selamlaması statik "Merhaba" olarak güncellendi.
+- **Backend Stabilizasyon:**
+    - Sunucu `0.0.0.0` dinleyecek şekilde yapılandırıldı (Gerçek cihaz erişimi için).
+    - Port çakışması (`EADDRINUSE`) temizlendi ve süreç yönetimi iyileştirildi.
+- **Test ve Kalite:**
+    - 94 adet backend entegrasyon testi ve 8 adet admin panel testi başarıyla tamamlandı.
+    - Job testlerindeki timeout sorunları giderildi.
 
 ## Bir Sonraki Oturumda Yapılacaklar
-1. **AdMob:** Gerçek reklam ID'lerinin entegrasyonu.
-2. **Uygulama İkonu:** Geçici ikonların özgün tasarımla değiştirilmesi.
-3. **Deployment:** Railway (Backend) ve Vercel (Admin) canlıya alma süreci.
+1. **İstatistik Takibi:** Admin dashboard metriklerinin (DAU, MAU, Completion Rate) doğrulanması.
+2. **Hata Yakalama:** Mobil tarafta detaylı bir error-boundary/hata sayfası tasarımı.
+3. **App Store Hazırlığı:** Privacy Policy ve Terms of Service sayfalarının oluşturulması.
