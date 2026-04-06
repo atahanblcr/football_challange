@@ -35,7 +35,10 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildContent(BuildContext context, WidgetRef ref, List<dynamic> questions) {
+  Widget _buildContent(BuildContext context, WidgetRef ref, List<DailyQuestion> allQuestions) {
+    final specialQuestion = allQuestions.where((q) => q.isSpecial).firstOrNull;
+    final questions = allQuestions.where((q) => !q.isSpecial).toList();
+
     return RefreshIndicator(
       onRefresh: () async => ref.invalidate(dailyQuestionsProvider),
       child: CustomScrollView(
@@ -53,7 +56,7 @@ class HomeScreen extends ConsumerWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Günaydın, 👋', style: AppTextStyles.bodySmall),
+                          const Text('Merhaba, 👋', style: AppTextStyles.bodySmall),
                           Consumer(
                             builder: (context, ref, _) {
                               return FutureBuilder<String>(
@@ -96,7 +99,11 @@ class HomeScreen extends ConsumerWidget {
                     ],
                   ),
                   const SizedBox(height: 32),
-                  const SpecialEventBannerWidget().animate().fadeIn().slideX(begin: -0.1, end: 0),
+                  if (specialQuestion != null)
+                    SpecialEventBannerWidget(question: specialQuestion)
+                        .animate()
+                        .fadeIn()
+                        .slideX(begin: -0.1, end: 0),
                 ],
               ),
             ),

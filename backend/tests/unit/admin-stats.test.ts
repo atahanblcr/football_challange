@@ -5,6 +5,9 @@ import { AuthProvider, QuestionModule, Difficulty, QuestionStatus } from '@prism
 describe('Admin Stats Service Unit Test', () => {
   beforeAll(async () => {
     // Selective cleanup: only delete related to this test's unique IDs
+    await prisma.dailyQuestionAssignment.deleteMany({
+      where: { question: { createdBy: 'stats_test_admin' } }
+    });
     await prisma.gameSession.deleteMany({
       where: { user: { nickname: { in: ['active_user', 'churned_user'] } } }
     });

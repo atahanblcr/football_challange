@@ -59,7 +59,7 @@ app.use(errorHandlerMiddleware);
 
 if (require.main === module) {
   const PORT = env.PORT;
-  app.listen(PORT, () => {
+  app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT} in ${env.NODE_ENV} mode`);
     initFirebase();
     startAllJobs();

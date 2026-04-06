@@ -29,6 +29,11 @@ const createWrapper = () => {
   );
 };
 
+// Mock useEvents hook
+vi.mock('@/hooks/use-events', () => ({
+  useEvents: vi.fn(() => ({ data: [] })),
+}));
+
 describe('QuestionEdit Page', () => {
   beforeEach(() => {
     vi.clearAllMocks();

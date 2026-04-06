@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/router/route_names.dart';
+import '../../domain/daily_question_model.dart';
 
 class SpecialEventBannerWidget extends StatelessWidget {
-  const SpecialEventBannerWidget({super.key});
+  final DailyQuestion question;
+
+  const SpecialEventBannerWidget({
+    super.key,
+    required this.question,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -51,14 +59,23 @@ class SpecialEventBannerWidget extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () => context.pushNamed(
+              RouteNames.challengeIntro,
+              pathParameters: {'questionId': question.id},
+              queryParameters: {
+                'module': question.module,
+                'difficulty': question.difficulty,
+                'answerCount': question.answerCount.toString(),
+                'timeLimit': question.timeLimit.toString(),
+              },
+            ),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.black,
               foregroundColor: Colors.white,
               minimumSize: const Size(double.infinity, 44),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
-            child: const Text('Hemen Oyna'),
+            child: Text(question.isCompleted ? 'Sonuçları Gör' : 'Hemen Oyna'),
           ),
         ],
       ),

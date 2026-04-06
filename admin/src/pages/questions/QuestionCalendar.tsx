@@ -71,6 +71,10 @@ export function QuestionCalendar() {
                 <span className="text-xs text-slate-300">Modül Atanmış</span>
               </div>
               <div className="flex items-center gap-3">
+                <div className="w-3 h-3 rounded-full bg-amber-400 shadow-sm shadow-amber-400/20" />
+                <span className="text-xs text-slate-300">Özel Etkinlik</span>
+              </div>
+              <div className="flex items-center gap-3">
                 <div className="w-3 h-3 rounded-full bg-wrong shadow-sm shadow-wrong/20" />
                 <span className="text-xs text-slate-300">Modül Eksik</span>
               </div>
@@ -137,17 +141,28 @@ export function QuestionCalendar() {
 
                       <div className="space-y-1">
                         {MODULES.map(mod => {
-                          const ass = dayAssignments.find((a: any) => 
-                            a.module === mod || a.question?.module === mod
+                          const normalAss = dayAssignments.find((a: any) => 
+                            (a.module === mod || a.question?.module === mod) && !a.isSpecial
                           );
+                          const specialAss = dayAssignments.find((a: any) => 
+                            (a.module === mod || a.question?.module === mod) && a.isSpecial
+                          );
+                          
                           return (
-                            <div 
-                              key={mod}
-                              title={ass ? ass.question?.title : `${MODULE_LABELS[mod]} Eksik`}
-                              className={`h-1.5 rounded-full transition-all ${
-                                ass ? 'bg-correct' : 'bg-wrong opacity-30 group-hover:opacity-100'
-                              }`}
-                            />
+                            <div key={mod} className="flex gap-0.5">
+                              <div 
+                                title={normalAss ? normalAss.question?.title : `${MODULE_LABELS[mod]} Eksik`}
+                                className={`h-1.5 flex-1 rounded-full transition-all ${
+                                  normalAss ? 'bg-correct' : 'bg-wrong opacity-30 group-hover:opacity-100'
+                                }`}
+                              />
+                              {specialAss && (
+                                <div 
+                                  title={`ÖZEL: ${specialAss.question?.title}`}
+                                  className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse"
+                                />
+                              )}
+                            </div>
                           );
                         })}
                       </div>
@@ -159,15 +174,29 @@ export function QuestionCalendar() {
                         </span>
                         <div className="space-y-1.5 overflow-y-auto">
                           {MODULES.map(mod => {
-                            const ass = dayAssignments.find((a: any) => 
-                              a.module === mod || a.question?.module === mod
+                            const normalAss = dayAssignments.find((a: any) => 
+                              (a.module === mod || a.question?.module === mod) && !a.isSpecial
                             );
+                            const specialAss = dayAssignments.find((a: any) => 
+                              (a.module === mod || a.question?.module === mod) && a.isSpecial
+                            );
+
                             return (
-                              <div key={mod} className="flex items-center gap-1.5">
-                                <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${ass ? 'bg-correct' : 'bg-wrong'}`} />
-                                <span className="text-[9px] text-slate-300 truncate max-w-[100px]">
-                                  {ass ? ass.question?.title : `${MODULE_LABELS[mod]} Eksik`}
-                                </span>
+                              <div key={mod} className="space-y-0.5">
+                                <div className="flex items-center gap-1.5">
+                                  <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${normalAss ? 'bg-correct' : 'bg-wrong'}`} />
+                                  <span className="text-[9px] text-slate-300 truncate max-w-[100px]">
+                                    {normalAss ? normalAss.question?.title : `${MODULE_LABELS[mod]} Eksik`}
+                                  </span>
+                                </div>
+                                {specialAss && (
+                                  <div className="flex items-center gap-1.5 pl-3">
+                                    <div className="w-1 h-1 rounded-full shrink-0 bg-amber-400" />
+                                    <span className="text-[8px] text-amber-400 font-bold truncate max-w-[90px]">
+                                      ÖZEL: {specialAss.question?.title}
+                                    </span>
+                                  </div>
+                                )}
                               </div>
                             );
                           })}

@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreateQuestion } from '@/hooks/use-questions';
+import { useEvents } from '@/hooks/use-events';
 import { AnswerDragList, AnswerItem } from '@/components/questions/AnswerDragList';
 import { EntitySearch } from '@/components/questions/EntitySearch';
 import { MODULE_LABELS, DIFFICULTY_CONFIG } from '@/lib/utils';
@@ -12,6 +13,7 @@ import toast from 'react-hot-toast';
 export function QuestionCreate() {
   const navigate = useNavigate();
   const createMutation = useCreateQuestion();
+  const { data: events } = useEvents();
 
   const [form, setForm] = useState({
     title: '',
@@ -210,10 +212,35 @@ export function QuestionCreate() {
                   id="isSpecial"
                   className="w-4 h-4 rounded border-surface-variant bg-background text-primary focus:ring-primary"
                   checked={form.isSpecial}
-                  onChange={e => setForm({ ...form, isSpecial: e.target.checked })}
+                  onChange={e => {
+                    const checked = e.target.checked;
+                    setForm({ 
+                      ...form, 
+                      isSpecial: checked,
+                      specialEventId: checked ? (events && events.length > 0 ? events.find((ev: any) => ev.isActive)?.id || events[0].id : '') : ''
+                    });
+                  }}
                 />
                 <label htmlFor="isSpecial" className="text-sm text-slate-300 font-medium cursor-pointer">Özel Etkinlik Sorusu</label>
               </div>
+
+              {form.isSpecial && (
+                <div className="mb-4 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <label className="text-[10px] font-bold text-slate-500 mb-1.5 block uppercase tracking-wider text-primary">Bağlı Etkinlik</label>
+                  <select
+                    className="w-full bg-background border border-primary/30 rounded-lg px-3 py-2.5 text-sm text-white focus:border-primary outline-none appearance-none"
+                    value={form.specialEventId}
+                    onChange={e => setForm({ ...form, specialEventId: e.target.value })}
+                  >
+                    <option value="">Etkinlik Seçin...</option>
+                    {events?.map((ev: any) => (
+                      <option key={ev.id} value={ev.id}>
+                        {ev.icon} {ev.name} {ev.isActive ? '(Aktif)' : ''}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               <div>
                 <label className="text-[10px] font-bold text-slate-500 mb-1.5 block uppercase tracking-wider">Programlı Yayın Tarihi</label>

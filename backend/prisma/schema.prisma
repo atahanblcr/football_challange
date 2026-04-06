@@ -195,10 +195,11 @@ model DailyQuestionAssignment {
   module     QuestionModule
   questionId String
   isExtra    Boolean        @default(false)
+  isSpecial  Boolean        @default(false)
 
   question   Question @relation(fields: [questionId], references: [id])
 
-  @@unique([date, module, isExtra])
+  @@unique([date, module, isExtra, isSpecial])
   @@index([date])
 }
 

@@ -107,11 +107,15 @@ export const adminQuestionsService = {
         date: { gte: startDate, lte: endDate }
       },
       include: {
-        question: { select: { id: true, title: true, module: true, status: true } }
+        question: { select: { id: true, title: true, module: true, status: true, isSpecial: true } }
       }
     });
 
-    return assignments;
+    return assignments.map(a => ({
+      ...a,
+      isSpecial: a.isSpecial,
+      isExtra: a.isExtra,
+    }));
   },
 
   create: async (data: any) => {
@@ -151,10 +155,11 @@ export const adminQuestionsService = {
 
         await tx.dailyQuestionAssignment.upsert({
           where: {
-            date_module_isExtra: {
+            date_module_isExtra_isSpecial: {
               date: scheduledDate,
               module: question.module,
               isExtra: false,
+              isSpecial: question.isSpecial,
             }
           },
           update: { questionId: question.id },
@@ -163,6 +168,7 @@ export const adminQuestionsService = {
             module: question.module,
             questionId: question.id,
             isExtra: false,
+            isSpecial: question.isSpecial,
           }
         });
       }
@@ -216,10 +222,11 @@ export const adminQuestionsService = {
 
         await tx.dailyQuestionAssignment.upsert({
           where: {
-            date_module_isExtra: {
+            date_module_isExtra_isSpecial: {
               date: scheduledDate,
               module: question.module,
               isExtra: false,
+              isSpecial: question.isSpecial,
             }
           },
           update: { questionId: question.id },
@@ -228,6 +235,7 @@ export const adminQuestionsService = {
             module: question.module,
             questionId: question.id,
             isExtra: false,
+            isSpecial: question.isSpecial,
           }
         });
       }

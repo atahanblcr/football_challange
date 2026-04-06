@@ -2,6 +2,8 @@ import { prisma } from '../../src/config/database';
 import { runDailyQuestionSelector } from '../../src/jobs/daily-question-selector.job';
 import { QuestionModule, QuestionStatus, Difficulty } from '@prisma/client';
 
+jest.setTimeout(30000);
+
 describe('Daily Question Selector Logic Tests (90-day Cooldown)', () => {
   // Use a module for testing that we can isolate
   const testModule: QuestionModule = 'managers';

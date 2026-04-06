@@ -6,14 +6,18 @@ class ApiEndpoints {
     const fromEnv = String.fromEnvironment('API_BASE_URL');
     if (fromEnv.isNotEmpty) return fromEnv;
 
-    // Local development defaults
-    if (kIsWeb) {
-      return 'http://localhost:3000/api/v1';
-    } else {
-      // Use your MacBook's local IP for physical devices and emulators
-      // 10.0.2.2 is ONLY for emulators, 192.168.1.103 works for both if on same WiFi
-      return 'http://192.168.1.103:3000/api/v1';
+    if (kIsWeb) return 'http://localhost:3000/api/v1';
+
+    // iOS Simülatör için: localhost (veya 127.0.0.1)
+    // Android Emülatör için: 10.0.2.2
+    // Gerçek Cihaz için: Bilgisayarının IP'si (192.168.1.103 gibi)
+    
+    if (!kIsWeb && Platform.isAndroid) {
+      return 'http://10.0.2.2:3000/api/v1';
     }
+    
+    // iOS Simülatör veya varsayılan (Simülatörde localhost en iyisidir)
+    return 'http://localhost:3000/api/v1';
   }
 
   // Auth

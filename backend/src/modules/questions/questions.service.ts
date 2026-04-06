@@ -30,12 +30,26 @@ export class QuestionService {
             basePoints: true,
             isSpecial: true,
             specialEventId: true,
+            specialEvent: {
+              select: { isActive: true }
+            }
           },
         },
       },
     });
 
-    return assignments.map((a) => a.question);
+    // 4. Özel etkinlik sorularını filtrele (Sadece isActive = true olanları göster)
+    return assignments
+      .map((a) => a.question)
+      .filter((q) => {
+        if (!q.isSpecial) return true;
+        return q.specialEventId && q.specialEvent?.isActive === true;
+      })
+      .map((q) => {
+        // specialEvent objesini response'dan temizle
+        const { specialEvent, ...questionMeta } = q;
+        return questionMeta;
+      });
   }
 
   /**
