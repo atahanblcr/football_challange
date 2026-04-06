@@ -10,7 +10,24 @@ describe('Admin Questions Integration Tests', () => {
   let testEntityIds: string[] = [];
 
   beforeAll(async () => {
-    // 1. Create a test admin
+    // 1. Cleanup any existing test data from previous failed runs
+    await prisma.dailyQuestionAssignment.deleteMany({
+      where: { question: { title: { contains: 'Admin Test' } } }
+    });
+    await prisma.questionAnswer.deleteMany({
+      where: { question: { title: { contains: 'Admin Test' } } }
+    });
+    await prisma.gameSession.deleteMany({
+      where: { question: { title: { contains: 'Admin Test' } } }
+    });
+    await prisma.question.deleteMany({
+      where: { title: { contains: 'Admin Test' } }
+    });
+    await prisma.adminUser.deleteMany({
+      where: { email: 'test_admin_q@example.com' }
+    });
+
+    // 2. Create a test admin
     const admin = await prisma.adminUser.create({
       data: {
         email: 'test_admin_q@example.com',
@@ -21,7 +38,7 @@ describe('Admin Questions Integration Tests', () => {
     adminId = admin.id;
     adminToken = jwtUtil.generateAdminSessionToken({ adminId: admin.id, role: 'super_admin' });
 
-    // 2. Create test entities
+    // 3. Create test entities
     const e1 = await prisma.entity.create({
       data: { name: 'Admin Test Player 1', type: 'player' as EntityType }
     });
@@ -33,6 +50,12 @@ describe('Admin Questions Integration Tests', () => {
 
   afterAll(async () => {
     // Cleanup
+    await prisma.dailyQuestionAssignment.deleteMany({
+      where: { question: { createdBy: adminId } }
+    });
+    await prisma.gameSession.deleteMany({
+      where: { question: { createdBy: adminId } }
+    });
     await prisma.questionAnswer.deleteMany({
       where: { question: { createdBy: adminId } }
     });
@@ -105,6 +128,104 @@ describe('Admin Questions Integration Tests', () => {
 
       const updatedQ = await prisma.question.findUnique({ where: { id: q?.id } });
       expect(updatedQ?.status).toBe('archived');
+    });
+  });
+
+  describe('Assignments Management', () => {
+    let testQId: string;
+    let anotherQId: string;
+    const testDate = '2026-05-20';
+
+    beforeAll(async () => {
+      const q1 = await prisma.question.create({
+        data: {
+          title: 'Admin Test Question Assignment 1',
+          module: 'players',
+          difficulty: 'easy',
+          status: 'active',
+          answerCount: 0,
+          createdBy: adminId,
+        }
+      });
+      testQId = q1.id;
+
+      const q2 = await prisma.question.create({
+        data: {
+          title: 'Admin Test Question Assignment 2',
+          module: 'players',
+          difficulty: 'easy',
+          status: 'active',
+          answerCount: 0,
+          createdBy: adminId,
+        }
+      });
+      anotherQId = q2.id;
+    });
+
+    it('should trigger auto assignment', async () => {
+      const response = await request(app)
+        .post('/api/admin/questions/assignments/trigger')
+        .set('x-admin-session', adminToken);
+
+      expect(response.status).toBe(200);
+      expect(response.body.status).toBe('success');
+      expect(Array.isArray(response.body.data)).toBe(true);
+    }, 15000);
+
+    it('should manually assign a question to a date', async () => {
+      const payload = {
+        date: testDate,
+        module: 'players',
+        questionId: testQId,
+        isSpecial: false
+      };
+
+      const response = await request(app)
+        .post('/api/admin/questions/assignments/assign')
+        .set('x-admin-session', adminToken)
+        .send(payload);
+
+      expect(response.status).toBe(200);
+      expect(response.body.data.questionId).toBe(testQId);
+
+      // Verify in DB
+      const dbAssignment = await prisma.dailyQuestionAssignment.findFirst({
+        where: { date: new Date(testDate + 'T00:00:00.000Z'), module: 'players' }
+      });
+      expect(dbAssignment?.questionId).toBe(testQId);
+    });
+
+    it('should get assignments for a specific day', async () => {
+      const response = await request(app)
+        .get('/api/admin/questions/assignments/day')
+        .set('x-admin-session', adminToken)
+        .query({ date: testDate });
+
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body.data)).toBe(true);
+      expect(response.body.data.some((a: any) => a.questionId === testQId)).toBe(true);
+    });
+
+    it('should randomize assignment for a module', async () => {
+      // Create a third question specifically for randomization to ensure one is available
+      const q3 = await prisma.question.create({
+        data: {
+          title: 'Admin Test Question Assignment 3',
+          module: 'players',
+          difficulty: 'easy',
+          status: 'active',
+          answerCount: 0,
+          createdBy: adminId,
+        }
+      });
+
+      const response = await request(app)
+        .post('/api/admin/questions/assignments/randomize')
+        .set('x-admin-session', adminToken)
+        .send({ date: testDate, module: 'players', isSpecial: false });
+
+      expect(response.status).toBe(200);
+      expect(response.body.data).toHaveProperty('questionId');
     });
   });
 });

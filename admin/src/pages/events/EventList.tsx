@@ -120,7 +120,7 @@ export function EventList() {
 
 function EventModal({ event, onClose }: { event?: any; onClose: () => void }) {
   const createMutation = useCreateEvent();
-  const updateMutation = useUpdateEvent(event?.id);
+  const updateMutation = useUpdateEvent();
   
   const [form, setForm] = useState({
     name: event?.name || '',
@@ -143,7 +143,7 @@ function EventModal({ event, onClose }: { event?: any; onClose: () => void }) {
     };
 
     if (event) {
-      updateMutation.mutate(payload, { onSuccess: onClose });
+      updateMutation.mutate({ id: event.id, data: payload }, { onSuccess: onClose });
     } else {
       createMutation.mutate(payload, { onSuccess: onClose });
     }

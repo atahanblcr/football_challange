@@ -1,23 +1,26 @@
 # AKTİF ÇALIŞMA BAĞLAMI (ACTIVE CONTEXT)
 
-**Şu Anki Faz:** Özel Etkinlik İş Akışı ve Sistem Entegrasyonu
-**Durum:** Tamamlandı (Regresyon Testleri Geçildi)
+**Şu Anki Faz:** Admin Paneli Geliştirmeleri ve Soru Atama Yönetimi
+**Durum:** Tamamlandı (Testler Geçildi)
 
 ## Son Yapılan İşlemler
-- **Özel Etkinlik (Special Event) İş Akışı:**
-    - `DailyQuestionAssignment` tablosuna `isSpecial` alanı eklendi ve unique kısıtlaması güncellendi. Artık aynı gün hem normal hem özel soru çakışmadan atanabiliyor.
-    - Admin panelinde soru oluşturma/düzenleme ekranlarına **"Bağlı Etkinlik"** seçim dropdown'ı eklendi.
-    - Soru Takvimi (Calendar) güncellendi; özel etkinlik soruları altın rengi ve tooltip ile ayırt edilebilir hale getirildi.
-- **Mobil Entegrasyon ve Bağlantı:**
-    - `api_endpoints.dart` güncellenerek simülatör (localhost), emülatör (10.0.2.2) ve fiziksel cihaz (PC IP) için dinamik geçiş sağlandı.
-    - Ana ekrandaki "Dünya Kupası" banner'ı fonksiyonel hale getirildi. "Hemen Oyna" butonu o günün özel sorusuna yönlendiriyor.
-    - "Günaydın" selamlaması statik "Merhaba" olarak güncellendi.
-- **Backend Stabilizasyon:**
-    - Sunucu `0.0.0.0` dinleyecek şekilde yapılandırıldı (Gerçek cihaz erişimi için).
-    - Port çakışması (`EADDRINUSE`) temizlendi ve süreç yönetimi iyileştirildi.
+- **Soru Atama Yönetimi (Daily Assignments):**
+    - `adminQuestionsService` altına `prefillAssignments`, `assignManual`, `assignRandom` ve `getAssignmentsByDate` metotları eklendi.
+    *   `POST /admin/questions/assignments/trigger`: Eksik günlerin sorularını tek tıkla otomatik doldurma özelliği eklendi.
+    *   `POST /admin/questions/assignments/assign`: Belirli bir tarihe manuel soru atama özelliği eklendi.
+    *   `POST /admin/questions/assignments/randomize`: Belirli bir tarihe havuzdan rastgele soru atama özelliği eklendi.
+    *   Cron job (`daily-question-selector.job.ts`), yeni servis metodunu kullanacak şekilde refaktör edildi.
+- **Soru Takvimi (Calendar) Geliştirmeleri:**
+    *   Takvime "Eksik Soruları Otomatik Tamamla" butonu eklendi.
+    *   Takvim günleri tıklanabilir hale getirildi; tıklanan gün için `DayAssignmentModal` açılıyor.
+    *   `DayAssignmentModal` üzerinden o günün tüm modül atamaları görülebiliyor ve "Soru Seç" veya "Rastgele" butonlarıyla anlık değiştirilebiliyor.
+    *   `QuestionPickerModal` ile modül bazlı arama yaparak manuel soru seçimi sağlandı.
+- **Etkinlik Düzenleme (Event Editing) Fix:**
+    *   Admin panelinde var olan etkinliklerin düzenlenememesi sorunu giderildi. `useUpdateEvent` hook'u ID'yi dinamik alacak şekilde güncellendi.
 - **Test ve Kalite:**
-    - 94 adet backend entegrasyon testi ve 8 adet admin panel testi başarıyla tamamlandı.
-    - Job testlerindeki timeout sorunları giderildi.
+    *   Backend tarafında soru atama yönetimi için kapsamlı entegrasyon testleri eklendi (`tests/admin/admin-questions.test.ts`).
+    *   Frontend tarafında yeni hook'lar için unit testler eklendi (`use-questions.test.tsx`).
+    *   Tüm regresyon testleri başarıyla tamamlandı.
 
 ## Bir Sonraki Oturumda Yapılacaklar
 1. **İstatistik Takibi:** Admin dashboard metriklerinin (DAU, MAU, Completion Rate) doğrulanması.

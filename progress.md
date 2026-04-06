@@ -22,7 +22,25 @@
 - [x] Admin panel testleri (8 test) pass edildi.
 - [x] EADDRINUSE port çakışması sorunu giderildi.
 
-## PROJE DURUMU: %100 ÖZEL ETKİNLİK İŞ AKIŞI TAMAMLANDI
+## [2026-04-06] — SORU ATAMA YÖNETİMİ VE ETKİNLİK DÜZENLEME FIX (TAMAMLANDI)
+
+### 7.1 Soru Atama Yönetimi (Daily Assignments) (TAMAMLANDI)
+- [x] `adminQuestionsService` altına `prefillAssignments`, `assignManual`, `assignRandom` ve `getAssignmentsByDate` metotları eklendi.
+- [x] `POST /admin/questions/assignments/trigger` endpoint'i ile eksik günlerin sorularını tek tıkla otomatik doldurma sağlandı.
+- [x] `POST /admin/questions/assignments/assign` ve `randomize` endpoint'leri ile esnek atama yönetimi sağlandı.
+- [x] Cron job, yeni servis metodunu kullanacak şekilde refaktör edildi.
+
+### 7.2 Admin Panel Geliştirmeleri (TAMAMLANDI)
+- [x] Soru Takvimi (Calendar) tıklanabilir hale getirildi ve `DayAssignmentModal` eklendi.
+- [x] `DayAssignmentModal` üzerinden manuel soru seçimi (`QuestionPickerModal`) ve rastgele atama özellikleri eklendi.
+- [x] Etkinlik düzenleme (Update Event) ekranındaki ID stale veri hatası giderildi.
+
+### 7.3 Test ve Kalite (TAMAMLANDI)
+- [x] Backend soru atama yönetimi testleri (`tests/admin/admin-questions.test.ts`) başarıyla tamamlandı.
+- [x] Frontend assignment hook testleri (`use-questions.test.tsx`) başarıyla tamamlandı.
+- [x] Tüm regresyon testleri pass edildi.
+
+## PROJE DURUMU: %100 SORU ATAMA YÖNETİMİ TAMAMLANDI
 
 ### Sıradaki Adım
 - [ ] Admin panel istatistiklerinin (Dashboard) gerçek verilerle test edilmesi.

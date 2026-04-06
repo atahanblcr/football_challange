@@ -37,13 +37,16 @@ export function useActivateEvent() {
   });
 }
 
-export function useUpdateEvent(id: string) {
+export function useUpdateEvent() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: any) => api.patch(`/admin/events/${id}`, data),
+    mutationFn: ({ id, data }: { id: string; data: any }) => api.patch(`/admin/events/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['events'] });
       toast.success('Etkinlik güncellendi');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Hata oluştu');
     },
   });
 }

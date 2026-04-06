@@ -61,3 +61,52 @@ export function useArchiveQuestion() {
     },
   });
 }
+
+// Atamalar
+export function useAssignmentsByDate(date: string) {
+  return useQuery({
+    queryKey: ['assignments', date],
+    queryFn: () => api.get('/admin/questions/assignments/day', { params: { date } }).then(r => r.data.data),
+    enabled: !!date,
+  });
+}
+
+export function useTriggerAssignments() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => api.post('/admin/questions/assignments/trigger'),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['questions-calendar'] });
+      toast.success('Soru atamaları tetiklendi');
+    },
+  });
+}
+
+export function useAssignManual() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { date: string; module: string; questionId: string; isSpecial?: boolean }) => 
+      api.post('/admin/questions/assignments/assign', data),
+    onSuccess: (_, variables) => {
+      qc.invalidateQueries({ queryKey: ['questions-calendar'] });
+      qc.invalidateQueries({ queryKey: ['assignments', variables.date] });
+      toast.success('Soru atandı');
+    },
+  });
+}
+
+export function useAssignRandom() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { date: string; module: string; isSpecial?: boolean }) => 
+      api.post('/admin/questions/assignments/randomize', data),
+    onSuccess: (_, variables) => {
+      qc.invalidateQueries({ queryKey: ['questions-calendar'] });
+      qc.invalidateQueries({ queryKey: ['assignments', variables.date] });
+      toast.success('Rastgele soru atandı');
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message ?? 'Hata oluştu');
+    },
+  });
+}

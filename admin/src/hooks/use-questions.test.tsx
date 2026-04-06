@@ -1,7 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useQuestions, useCreateQuestion } from './use-questions';
+import { 
+  useQuestions, useCreateQuestion, useAssignmentsByDate, 
+  useTriggerAssignments, useAssignManual, useAssignRandom 
+} from './use-questions';
 import { api } from '@/config/api';
 import React from 'react';
 
@@ -61,5 +64,56 @@ describe('useQuestions hooks', () => {
     await result.current.mutateAsync(mockPayload);
 
     expect(api.post).toHaveBeenCalledWith('/admin/questions', mockPayload);
+  });
+
+  it('useAssignmentsByDate should fetch assignments for a day', async () => {
+    const mockData = [{ id: 'a1', question: { title: 'Q1' } }];
+    (api.get as any).mockResolvedValue({ data: { data: mockData } });
+
+    const { result } = renderHook(() => useAssignmentsByDate('2026-04-06'), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data).toEqual(mockData);
+    expect(api.get).toHaveBeenCalledWith('/admin/questions/assignments/day', { params: { date: '2026-04-06' } });
+  });
+
+  it('useTriggerAssignments should call trigger endpoint', async () => {
+    (api.post as any).mockResolvedValue({ data: { status: 'success' } });
+
+    const { result } = renderHook(() => useTriggerAssignments(), {
+      wrapper: createWrapper(),
+    });
+
+    await result.current.mutateAsync();
+
+    expect(api.post).toHaveBeenCalledWith('/admin/questions/assignments/trigger');
+  });
+
+  it('useAssignManual should call assign endpoint', async () => {
+    const mockPayload = { date: '2026-04-06', module: 'players', questionId: 'q1' };
+    (api.post as any).mockResolvedValue({ data: { status: 'success' } });
+
+    const { result } = renderHook(() => useAssignManual(), {
+      wrapper: createWrapper(),
+    });
+
+    await result.current.mutateAsync(mockPayload);
+
+    expect(api.post).toHaveBeenCalledWith('/admin/questions/assignments/assign', mockPayload);
+  });
+
+  it('useAssignRandom should call randomize endpoint', async () => {
+    const mockPayload = { date: '2026-04-06', module: 'players' };
+    (api.post as any).mockResolvedValue({ data: { status: 'success' } });
+
+    const { result } = renderHook(() => useAssignRandom(), {
+      wrapper: createWrapper(),
+    });
+
+    await result.current.mutateAsync(mockPayload);
+
+    expect(api.post).toHaveBeenCalledWith('/admin/questions/assignments/randomize', mockPayload);
   });
 });
