@@ -64,7 +64,7 @@ export const adminQuestionsController = {
 
   triggerAutoAssignment: async (_req: Request, res: Response, next: NextFunction) => {
     try {
-      const result = await adminQuestionsService.prefillAssignments(7);
+      const result = await adminQuestionsService.prefillAssignments(30);
       res.status(200).json({ status: 'success', data: result });
     } catch (error) {
       next(error);

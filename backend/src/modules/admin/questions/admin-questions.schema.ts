@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { Difficulty, QuestionModule, QuestionStatus } from '@prisma/client';
 
 const answerSchema = z.object({
-  entityId: z.string().cuid().or(z.string()), // Accept cuid or any string as ID
+  entityId: z.string().min(1),
   rank: z.number().int().min(1),
   statValue: z.string().min(1),
   statDisplay: z.string().optional().nullable(),
@@ -21,7 +21,7 @@ export const adminQuestionsSchema = {
       status: z.nativeEnum(QuestionStatus).default(QuestionStatus.draft),
       isSpecial: z.boolean().default(false),
       specialEventId: z.string().optional().nullable(),
-      scheduledFor: z.string().datetime().optional().nullable(),
+      scheduledFor: z.string().optional().nullable(),
       answers: z.array(answerSchema).min(1),
     }),
   }),
@@ -37,8 +37,25 @@ export const adminQuestionsSchema = {
       status: z.nativeEnum(QuestionStatus).optional(),
       isSpecial: z.boolean().optional(),
       specialEventId: z.string().optional().nullable(),
-      scheduledFor: z.string().datetime().optional().nullable(),
+      scheduledFor: z.string().optional().nullable(),
       answers: z.array(answerSchema).min(1).optional(),
+    }),
+  }),
+
+  assign: z.object({
+    body: z.object({
+      date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Geçersiz tarih formatı (YYYY-MM-DD)'),
+      module: z.nativeEnum(QuestionModule),
+      questionId: z.string().min(1),
+      isSpecial: z.boolean().optional().default(false),
+    }),
+  }),
+
+  randomize: z.object({
+    body: z.object({
+      date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Geçersiz tarih formatı (YYYY-MM-DD)'),
+      module: z.nativeEnum(QuestionModule),
+      isSpecial: z.boolean().optional().default(false),
     }),
   }),
 };

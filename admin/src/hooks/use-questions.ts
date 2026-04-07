@@ -79,6 +79,9 @@ export function useTriggerAssignments() {
       qc.invalidateQueries({ queryKey: ['questions-calendar'] });
       toast.success('Soru atamaları tetiklendi');
     },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.error?.message ?? 'Atama hatası oluştu');
+    },
   });
 }
 
@@ -91,6 +94,9 @@ export function useAssignManual() {
       qc.invalidateQueries({ queryKey: ['questions-calendar'] });
       qc.invalidateQueries({ queryKey: ['assignments', variables.date] });
       toast.success('Soru atandı');
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.error?.message ?? 'Atama hatası oluştu');
     },
   });
 }
@@ -106,7 +112,7 @@ export function useAssignRandom() {
       toast.success('Rastgele soru atandı');
     },
     onError: (err: any) => {
-      toast.error(err?.response?.data?.message ?? 'Hata oluştu');
+      toast.error(err?.response?.data?.error?.message ?? 'Rastgele atama hatası oluştu');
     },
   });
 }

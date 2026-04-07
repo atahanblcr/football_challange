@@ -105,7 +105,10 @@ export const adminQuestionsService = {
 
     const assignments = await prisma.dailyQuestionAssignment.findMany({
       where: {
-        date: { gte: startDate, lte: endDate }
+        date: {
+          gte: startDate,
+          lte: endDate
+        }
       },
       include: {
         question: { select: { id: true, title: true, module: true, status: true, isSpecial: true } }
@@ -115,33 +118,46 @@ export const adminQuestionsService = {
 
     return assignments.map(a => ({
       ...a,
+      // Date nesnesini YYYY-MM-DD formatında string'e dönüştürerek frontend'e gönderelim
+      // Bu sayede timezone karmaşası önlenir.
+      date: a.date.toISOString().split('T')[0],
       isSpecial: a.isSpecial,
       isExtra: a.isExtra,
     }));
   },
 
   getAssignmentsByDate: async (dateStr: string) => {
+    // dateStr: YYYY-MM-DD formatında gelir.
     const [year, month, day] = dateStr.split('-').map(Number);
     const date = new Date(Date.UTC(year, month - 1, day));
 
-    return prisma.dailyQuestionAssignment.findMany({
+    const assignments = await prisma.dailyQuestionAssignment.findMany({
       where: { date },
       include: {
         question: { select: { id: true, title: true, module: true, status: true, isSpecial: true } }
       }
     });
+
+    return assignments.map(a => ({
+      ...a,
+      date: a.date.toISOString().split('T')[0]
+    }));
   },
 
-  prefillAssignments: async (daysToPrefill: number = 7) => {
+  prefillAssignments: async (daysToPrefill: number = 30) => {
     const modules: QuestionModule[] = ['players', 'clubs', 'nationals', 'managers'];
     const results = [];
 
+    // Mevcut tarih UTC+3 Istanbul'a göre ayarlanmalı ama server UTC olduğu için 
+    // bugünün tarihini UTC 00:00:00 olarak alalım.
+    const now = new Date();
+    const [yearNow, monthNow, dayNow] = now.toISOString().split('T')[0].split('-').map(Number);
+    const startDate = new Date(Date.UTC(yearNow, monthNow - 1, dayNow));
+
     for (let i = 0; i < daysToPrefill; i++) {
-      const targetDate = new Date();
-      targetDate.setDate(targetDate.getDate() + i);
-      const datePart = targetDate.toISOString().split('T')[0];
-      const [year, month, day] = datePart.split('-').map(Number);
-      const scheduledDate = new Date(Date.UTC(year, month - 1, day));
+      const scheduledDate = new Date(startDate);
+      scheduledDate.setUTCDate(startDate.getUTCDate() + i);
+      const dateStr = scheduledDate.toISOString().split('T')[0];
 
       for (const module of modules) {
         // 1. Zaten seçilmiş mi kontrol et
@@ -159,7 +175,7 @@ export const adminQuestionsService = {
         if (existing) continue;
 
         // 2. Havuzdan uygun bir soru seç
-        const questionId = await adminQuestionsService.findEligibleQuestion(module, scheduledDate);
+        const questionId = await adminQuestionsService.findEligibleQuestion(module, scheduledDate, false);
 
         if (questionId) {
           await prisma.$transaction([
@@ -175,7 +191,7 @@ export const adminQuestionsService = {
               data: { lastShownAt: scheduledDate }
             })
           ]);
-          results.push({ date: datePart, module, questionId });
+          results.push({ date: dateStr, module, questionId });
         }
       }
     }
@@ -218,41 +234,83 @@ export const adminQuestionsService = {
     const [year, month, day] = dateStr.split('-').map(Number);
     const scheduledDate = new Date(Date.UTC(year, month - 1, day));
 
-    const questionId = await adminQuestionsService.findEligibleQuestion(module, scheduledDate);
-    if (!questionId) throw ApiError.badRequest(ErrorCode.NOT_FOUND, `Bu modül için havuzda uygun soru bulunamadı: ${module}`);
+    // Eğer o gün zaten bir atama varsa, o soruyu havuzdan hariç tutalım ki aynısı gelmesin
+    const existing = await prisma.dailyQuestionAssignment.findUnique({
+      where: {
+        date_module_isExtra_isSpecial: {
+          date: scheduledDate,
+          module,
+          isExtra: false,
+          isSpecial,
+        }
+      }
+    });
+
+    const questionId = await adminQuestionsService.findEligibleQuestion(module, scheduledDate, isSpecial, existing?.questionId);
+    if (!questionId) {
+      throw ApiError.badRequest(ErrorCode.NOT_FOUND, `Bu modül için havuzda uygun soru bulunamadı: ${module}${isSpecial ? ' (Özel Etkinlik)' : ''}. Lütfen aktif soru sayısını kontrol edin.`);
+    }
 
     return adminQuestionsService.assignManual(dateStr, module, questionId, isSpecial);
   },
 
-  findEligibleQuestion: async (module: QuestionModule, date: Date) => {
-    const ninetyDaysAgo = new Date(date);
-    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+  findEligibleQuestion: async (module: QuestionModule, date: Date, isSpecial: boolean = false, currentQuestionId?: string) => {
+    // Kademeli olarak pencereyi daraltalım: 90 gün -> 30 gün -> 0 gün
+    const windows = [90, 30, 0];
 
-    // Şu anki ve gelecekteki atamaları da hariç tutalım
-    const currentlyAssigned = await prisma.dailyQuestionAssignment.findMany({
-      where: {
-        date: { gte: ninetyDaysAgo }
-      },
-      select: { questionId: true }
-    });
-    const excludedIds = currentlyAssigned.map(a => a.questionId);
+    for (const days of windows) {
+      const startDate = new Date(date);
+      startDate.setDate(startDate.getDate() - days);
+      
+      const endDate = new Date(date);
+      endDate.setDate(endDate.getDate() + days);
 
-    const pool = await prisma.question.findMany({
-      where: {
-        module: module,
-        status: QuestionStatus.active,
-        isSpecial: false,
-        id: { notIn: excludedIds },
-        OR: [
-          { lastShownAt: null },
-          { lastShownAt: { lt: ninetyDaysAgo } }
-        ]
-      },
-      select: { id: true }
-    });
+      // 1. Pencere içindeki atamaları bul
+      const assignedInWindow = await prisma.dailyQuestionAssignment.findMany({
+        where: {
+          date: {
+            gte: startDate,
+            lte: endDate
+          }
+        },
+        select: { questionId: true }
+      });
+      
+      const excludedIds = assignedInWindow.map(a => a.questionId);
+      if (currentQuestionId) {
+        if (!excludedIds.includes(currentQuestionId)) excludedIds.push(currentQuestionId);
+      }
 
-    if (pool.length === 0) return null;
-    return pool[Math.floor(Math.random() * pool.length)].id;
+      // 2. Havuzdan uygun bir soru seç
+      // ÖNEMLİ: SQL'de NOT (tarih_aralığı) NULL değerleri de eler. 
+      // Bu yüzden NULL olanları (hiç gösterilmemiş) açıkça dahil etmeliyiz.
+      const pool = await prisma.question.findMany({
+        where: {
+          module: module,
+          status: QuestionStatus.active,
+          isSpecial: isSpecial,
+          id: { notIn: excludedIds },
+          OR: [
+            { lastShownAt: null },
+            {
+              NOT: {
+                lastShownAt: {
+                  gte: startDate,
+                  lte: endDate
+                }
+              }
+            }
+          ]
+        },
+        select: { id: true }
+      });
+
+      if (pool.length > 0) {
+        return pool[Math.floor(Math.random() * pool.length)].id;
+      }
+    }
+
+    return null;
   },
 
   create: async (data: any) => {

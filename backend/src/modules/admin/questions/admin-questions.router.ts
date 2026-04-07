@@ -18,8 +18,8 @@ router.get('/:id', rbacMiddleware(AdminRole.moderator), adminQuestionsController
 
 router.post('/', rbacMiddleware(AdminRole.editor), validate(adminQuestionsSchema.create), adminQuestionsController.create);
 router.post('/assignments/trigger', rbacMiddleware(AdminRole.editor), adminQuestionsController.triggerAutoAssignment);
-router.post('/assignments/assign', rbacMiddleware(AdminRole.editor), adminQuestionsController.assignManual);
-router.post('/assignments/randomize', rbacMiddleware(AdminRole.editor), adminQuestionsController.assignRandom);
+router.post('/assignments/assign', rbacMiddleware(AdminRole.editor), validate(adminQuestionsSchema.assign), adminQuestionsController.assignManual);
+router.post('/assignments/randomize', rbacMiddleware(AdminRole.editor), validate(adminQuestionsSchema.randomize), adminQuestionsController.assignRandom);
 router.patch('/:id', rbacMiddleware(AdminRole.editor), validate(adminQuestionsSchema.update), adminQuestionsController.update);
 router.post('/:id/archive', rbacMiddleware(AdminRole.editor), adminQuestionsController.archive);
 
